@@ -1,0 +1,25 @@
+#specify the IP addresses or hostnames of the server_ip nodes below separated by ',' as shown below.
+#SERVER_IP_ADDRS="rhsauto023.lab.eng.blr.redhat.com,rhsauto029.lab.eng.blr.redhat.com,rhsauto030.lab.eng.blr.redhat.com,rhsauto032.lab.eng.blr.redhat.com,rhsauto065.lab.eng.blr.redhat.com"
+
+SERVER_IP_ADDRS="172.17.0.6,172.17.0.7"
+
+#specify the prefix path here. This is where glusterfs will be installed if one chooses to install gluster from source.
+PREFIX_PATH=""
+
+#Specify the volume name here.
+VOLNAME="hosdu"
+
+VOL_TYPE="1x2x1"
+
+SERVER_EXPORT_DIR="/rhs_bricks"
+
+
+#Specify the transport type of the volume. Possible values are tcp, rdma and tcp,rdma
+TRANS_TYPE="tcp"
+
+#specify the mountpoint
+MOUNTPOINT="/mnt/"
+
+#specify the mount point i.e client protocol here. valid values are 'nfs' and 'fuse' and 'rdma'. Specify 'rdma' only in case of tcp,rdma transport type.
+#Else it wil lbe rejected
+MOUNT_TYPE="rdma"
