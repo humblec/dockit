@@ -90,7 +90,7 @@ class glusteractions():
         for node in nodes:
             flag = flag1 = status1 = status2 = 0
             logger.info("Configuring/installing on node:%s", node)
-            status1 = run_helper.run_command(node, gluster_package_command, False)
+            status1 = run_helper.run_command(node, gluster_package_command, True)
             #time.sleep(20)
 
             if status1:
@@ -99,7 +99,7 @@ class glusteractions():
                 flag = 1
             else:
                 logger.info("Continuing ..")
-                status2 = run_helper.run_command(node, gluster_install_command, False)
+                status2 = run_helper.run_command(node, gluster_install_command, True)
                 time.sleep(20)
                 if status2:
                     logger.error("Failed to configure GlusterFs from source repository ")
@@ -109,7 +109,7 @@ class glusteractions():
                 else:
                     logger.info("Successfully configured GlusterFS binary on node:%s", node)
 
-        if flag or flag1:
+        if status1 or status2:
             logger.critical("Failed to install gluster packages on:%s or GlusterFs binary installation failed on :%s ", failed_package_nodes, failed_install_nodes)
         else:
             logger.info("Successful Gluster Package Installation and GlusterFS Binary installation on all the nodes!")

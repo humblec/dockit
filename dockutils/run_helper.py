@@ -198,7 +198,7 @@ def run_command(node, cmd, verbose):
         if verbose == True:
             logger.debug ("node: %s ->  exit status: %d ", node, ret_code)
             # print cmd
-            #print '\n' + fout.read() +ferr.read()
+            print '\n' + fout.read() +ferr.read()
            # logger.debug("%s ",fout.read())
            # logger.error("%s ",ferr.read())
 

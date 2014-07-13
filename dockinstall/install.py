@@ -58,7 +58,7 @@ globalopts={}
 
 
 
-def talktoDocker(pulloption, baseimage, imagetag, numcontainers, dockerfile, dockerrepo, buildoption, startoption, gluster_mode):
+def talktoDocker(pulloption, baseimage, imagetag, numcontainers, dockerfile, dockerrepo, buildoption, startoption, gluster_mode, gluster_install, gluster_volume):
     new_image_tag=''
 
     flag=0
@@ -133,62 +133,67 @@ def talktoDocker(pulloption, baseimage, imagetag, numcontainers, dockerfile, doc
                 logger.debug("Going to run the containers")
 
                 if gluster_mode:
-                    gluster_flag =1
-
+                    if gluster_volume:
+                        gluster_flag = 1
+                    else:
+                        gluster_flag = 0
                 runret =  connret.runC(ret_exist['RepoTags'][0], gluster_flag, gluster_config, )
                 if runret:
                     if not connret.container_ips:
                         logger.debug( "Something went wrong when spawning containers:exiting")
                         sys.exit(1)
 
+
                     logger.info("Containers are running successfully.. please login and work!!!!")
                     print (60 * '-')
                     logger.info("Details about running containers..\n")
-                    #print "Details about running containers..\n"
                     logger.info("Container IPs \t : %s\n ", connret.container_ips)
-                    #print "Container IPs \t : %s\n " %(connret.container_ips)
-                    #print connret.container_ips
+
                     for c in connret.cons_ids:
                         c_id =  dict(connret.cons_ids[0])['Id']
                         cons_ids.append(c_id)
                     logger.info("Container Ids \t : %s \n ", cons_ids)
-                    #print "Container Ids: %s" %(cons_ids)
                     print (60 * '-')
-                    #print cons_ids
                     #todo : Its possible to auto login to these containers via below , commenting it out for now
                     #loginC(connret.container_ips, connret.cons_ids)
-                    #print "Configuration received from user:"
-                    #print gluster_config
-		    if gluster_mode:
-                    	run_helper.rh_config_dict['SERVER_IP_ADDRS'] =connret.container_ips
-                    	run_helper.rh_config_dict['VOL_TYPE'] = gluster_config['VOL_TYPE']
-                    	run_helper.rh_config_dict['SERVER_EXPORT_DIR'] =gluster_config['SERVER_EXPORT_DIR']
-                    	run_helper.rh_config_dict['TRANS_TYPE'] ='tcp'
-                    	run_helper.rh_config_dict['VOLNAME'] =gluster_config['VOLNAME']
-                    	logger.debug("Successfully filled configuration details:%s", run_helper.rh_config_dict)
-
-                    	#create_vol.create_gluster_volume(start=True)
+               	    if gluster_mode:
                         gluster_cli = create_vol.glusteractions()
                         if gluster_cli:
-                            logger.debug("Successfully created gluster cli")
-                            gv =  gluster_config.get('GLUSTER_VERSION','3.5')
-                            if gv:
-                              #  print dir(gluster_cli)
-                                gluster_cli.gluster_install(gv)
+                            logger.debug("Successfully created gluster client")
+                            run_helper.rh_config_dict['SERVER_IP_ADDRS'] =connret.container_ips
+                        else:
+                            logger.error("Failed to create gluster client")
+                        if gluster_install:
+                            ginst =  gluster_config.get('GLUSTER_VERSION','3.5')
+                            if ginst:
+                                gluster_cli.gluster_install(ginst)
+                            else:
+                                logger.debug("Failed to get Gluster Version from dict.")
+                        else:
+                            logger.info("Gluster installation not required")
+                        if gluster_volume:
+
+                    	    run_helper.rh_config_dict['VOL_TYPE'] = gluster_config['VOL_TYPE']
+                    	    run_helper.rh_config_dict['SERVER_EXPORT_DIR'] =gluster_config['SERVER_EXPORT_DIR']
+                    	    run_helper.rh_config_dict['TRANS_TYPE'] ='tcp'
+                    	    run_helper.rh_config_dict['VOLNAME'] =gluster_config['VOLNAME']
+                    	    logger.debug("Successfully filled configuration details:%s", run_helper.rh_config_dict)
                             gluster_cli.create_gluster_volume(start=True)
-		    else:
-			print "Done!!"
+                            logging.info('Gluster Volume operations done')
+                        else:
+                            logger.info("Gluster Volume creation not required")
+                    else:
+                        logger.info("Done!")
                 else:
                     logger.error( "Failed when starting/inspecting containers")
-
             else:
                 logger.error("Image + tag does not exist.. I cant start container from this..exiting")
 
                 sys.exit(1)
         else:
             logger.debug( "Not trying to start containers..")
-        logger.debug( "Dockit finished...")
-        return True
+            logger.debug( "Dockit finished...")
+            return True
 
 
 
@@ -476,8 +481,13 @@ def main(dryr=0, dockit_log=dockit_log_file):
     parser.add_option("-r", "--dockerrepo",
                       dest="dockerrepo", help="Docker repository name with a trailing blackslash  - ", metavar="DOCKERREPO")
 
-    parser.add_option("--gv", "--glusterversion",
-                      dest="glusterv", help="Gluster version to install inside containers  - ", metavar="GLUSTERVERSION")
+    parser.add_option("--gv", "--glustervolume",
+                      action="store_true", dest = "gluvolume", default=False,help="Gluster Volume Creation  inside containers  - Valid with -g option ")
+                     # dest="gluvolume", help="Gluster Volume Creation  inside containers  - Valid with -g option ", metavar="GLUSTERVOLUME")
+
+    parser.add_option("--gi", "--glusterinstall",
+                      dest="gluinst", help="Install gluster inside containers  - Valid with -g option ", metavar="GLUSTERINSTALL")
+
     logger.debug( "Dockit process logs are available at %s " % (dockit_log_file))
     options, arguments = parser.parse_args()
     globalopts=dict(options.__dict__)
@@ -486,7 +496,7 @@ def main(dryr=0, dockit_log=dockit_log_file):
     #pull_option_args = ['image']
     build_option_args = ['dockerfile','imgtag']
     start_option_args = ['image', 'imgtag', 'count']
-
+    gluster_optins_args = ['gluvolume','gluinst']
 
     anyopt = [ options.pullimg , options.buildimg , options.startc , options.dry]
     anyopt_dict = { 'pullimg':pull_option_args , 'buildimg':build_option_args , 'startc':start_option_args }
@@ -496,7 +506,12 @@ def main(dryr=0, dockit_log=dockit_log_file):
         logging.warn( "You missed one of the must required option..  reread and execute.... exiting .")
         #print_menu()
         sys.exit(1)
-
+    if options.gluinst or options.gluvolume:
+        if not options.glumode:
+            logger.error("You can not use gluster actions without -g option")
+            sys.exit(1)
+    if options.glumode and not options.gluvolume and not options.gluinst:
+        logger.info("-g dont have any effect without --gv or --gi options")
 
     final_true_list = [[key,value] for key,value in globalopts.items() if value != False if value != None]
     logger.debug("Input \t :%s" ,final_true_list)
@@ -538,65 +553,67 @@ def main(dryr=0, dockit_log=dockit_log_file):
             logger.info( "Proceeding ")
             if options.glumode:
 
-                logger.debug( "\n Need to configure gluster volumes, taking inputs \n")
-                if options.glusterv:
+
+                if options.gluinst:
                     logger.info( "Need to install gluster inside containers")
+                    gluster_config['GLUSTER_VERSION'] = options.gluinst
 
-                    gluster_config['GLUSTER_VERSION'] = options.glusterv
+                if options.gluvolume:
+                    logger.info( "\n Need to configure gluster volume..\n")
 
-                g_voltype=''
-                if not options.configfile:
-                    g_voltype = raw_input("Gluster Volume Type (ex: 2x2x1 where (distribute,replica, stripe count in order)\t :")
-                    g_volname = raw_input("Gluster Volume Name (ex: glustervol)\t :")
-                    g_export  = raw_input("Gluster Export Dir Name (ex: /rhs_bricks)\t :")
-                    g_brick_file = raw_input("Gluster brick file (ex: /home/configfile)\t :")
-                else:
-                    logger.info( "Reading gluster configuration from config file")
-                    print read_config_file(options.configfile)
-
-                try:
-                    if g_voltype:
-                        volumeconfig = re.search(r'([0-9]+)x([0-9]+)x([0-9]+)', g_voltype)
-                    else:
-                        gluster_config['VOL_TYPE'] = gluster_config.get('VOL_TYPE', '1x2x1')
-                        gluster_config['VOLNAME']=gluster_config.get('VOLNAME', 'default_vol')
-                        gluster_config['SERVER_EXPORT_DIR']=gluster_config.get('SERVER_EXPORT_DIR','default_server_Export')
-                        volumeconfig = re.search(r'([0-9]+)x([0-9]+)x([0-9]+)',gluster_config['VOL_TYPE'])
-                    distributecount = volumeconfig.group(1)
-                    replicacount = volumeconfig.group(2)
-                    stripevcount = volumeconfig.group(3)
-                except Exception as e:
-                    logger.debug( "Error in parsing volume type string..exiting")
-                    logger.debug(e)
-                    sys.exit(1)
-
-                if distributecount == '0':
-                    distributecount =  1
-                if replicacount == '0':
-                    replicacount =  1
-                if stripevcount == '0':
-                    stripevcount =   1
-
-                options.count = int(distributecount) * int(replicacount) * int(stripevcount)
-                logger.debug( "No of gluster containers to spawn:%s" , options.count)
-                prefer = raw_input ("Do you want to continue (y/n):")
-                if prefer == 'y':
+                    g_voltype=''
                     if not options.configfile:
-                        gluster_config['VOLNAME']=g_volname
-                        gluster_config['VOL_TYPE']=g_voltype
-                        gluster_config['SERVER_EXPORT_DIR']=g_export
-                        gluster_config['BRICK_FILE']=g_brick_file
-                        #gluster_config['BRICKS'] = read_config_file_b(g_brick_file)
-                        read_config_file_b(g_brick_file)
+                        g_voltype = raw_input("Gluster Volume Type (ex: 2x2x1 where (distribute,replica, stripe count in order)\t :")
+                        g_volname = raw_input("Gluster Volume Name (ex: glustervol)\t :")
+                        g_export  = raw_input("Gluster Export Dir Name (ex: /rhs_bricks)\t :")
+                        g_brick_file = raw_input("Gluster brick file (ex: /home/configfile)\t :")
                     else:
-                        logger.info( "Configuration read from configuration file")
+                        logger.info( "Reading gluster configuration from config file")
+                        print read_config_file(options.configfile)
 
-                    logger.info("%s", gluster_config)
-                else:
-                    logger.debug( "Exiting.. Invoke dockit command with proper option of gluster mode")
-                    sys.exit(1)
+                    try:
+                        if g_voltype:
+                            volumeconfig = re.search(r'([0-9]+)x([0-9]+)x([0-9]+)', g_voltype)
+                        else:
+                            gluster_config['VOL_TYPE'] = gluster_config.get('VOL_TYPE', '1x2x1')
+                            gluster_config['VOLNAME']=gluster_config.get('VOLNAME', 'default_vol')
+                            gluster_config['SERVER_EXPORT_DIR']=gluster_config.get('SERVER_EXPORT_DIR','default_server_Export')
+                            volumeconfig = re.search(r'([0-9]+)x([0-9]+)x([0-9]+)',gluster_config['VOL_TYPE'])
+                        distributecount = volumeconfig.group(1)
+                        replicacount = volumeconfig.group(2)
+                        stripevcount = volumeconfig.group(3)
+                    except Exception as e:
+                        logger.debug( "Error in parsing volume type string..exiting")
+                        logger.debug(e)
+                        sys.exit(1)
+
+                    if distributecount == '0':
+                        distributecount =  1
+                    if replicacount == '0':
+                        replicacount =  1
+                    if stripevcount == '0':
+                        stripevcount =   1
+
+                    options.count = int(distributecount) * int(replicacount) * int(stripevcount)
+                    logger.info( "No of gluster containers to spawn:%s" , options.count)
+                    prefer = raw_input ("Do you want to continue (y/n):")
+                    if prefer == 'y':
+                        if not options.configfile:
+                            gluster_config['VOLNAME']=g_volname
+                            gluster_config['VOL_TYPE']=g_voltype
+                            gluster_config['SERVER_EXPORT_DIR']=g_export
+                            gluster_config['BRICK_FILE']=g_brick_file
+                            #gluster_config['BRICKS'] = read_config_file_b(g_brick_file)
+                            read_config_file_b(g_brick_file)
+                        else:
+                            logger.info( "Configuration read from configuration file")
+
+                        logger.info("%s", gluster_config)
+                    else:
+                        logger.debug( "Exiting.. Invoke dockit command with proper option of gluster mode")
+                        sys.exit(1)
             else:
-                logger.debug( "Run containers natively, no mode configured")
+                logger.info( "Run containers natively, no mode configured")
             prefer=''
         else:
             logger.debug( "Exiting ")
@@ -633,7 +650,7 @@ def main(dryr=0, dockit_log=dockit_log_file):
             logger.debug("Connecting to the docker deamon")
 
             talktoDocker(options.pullimg, options.image, options.imgtag, options.count, options.dockerfile,
-                         options.dockerrepo , options.buildimg, options.startc, options.glumode)
+                         options.dockerrepo , options.buildimg, options.startc, options.glumode, options.gluinst, options.gluvolume)
 
     except Exception as e:
         logger.debug(e)

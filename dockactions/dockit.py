@@ -170,7 +170,7 @@ class DockerCli (docker.Client):
 
             logger.info("Bricks will be using in order:%s", self.brick_set)
 
-        logging.info( "Enable Gluster :%s" ,self.gflag)
+        logging.info( "Enable Gluster Volume :%s" ,self.gflag)
         try:
             #docker run -i -t ubuntu /bin/bash
 
