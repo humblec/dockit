@@ -372,11 +372,14 @@ def print_menu():
     print ("   M A I N - M E N U - O F - DOCKIT")
     print (60 * '-')
     print ("Invoke dockit with any of (-d , -p, -b, -s) options \n")
-    print ("1. Install and Run Docker deamon                  (-d) -->  dryrun   ")
-    print ("2. Pull image from docker repo and Run containers (-p) -->  requires -i <IMAGE> and -r <DOCKERREPO>")
-    print ("3. Build from dockerfile and Run Containers       (-b) -->  requires -f <DOCKER FILE> and -t <IMAGE TAG> ")
-    print ("4. Run container from existing image              (-s) -->  requires -i <IMAGE> and -t <IMAGE TAG> -n <COUNT>")
-    print ("Optional: Create and start gluster containers     (-g) -->  Effective only with -s option")
+    print ("1. Install and Run Docker deamon                     (-d)   -->  dryrun   ")
+    print ("2. Pull image from docker repo and Run containers    (-p)   -->  requires -i <IMAGE> and -r <DOCKERREPO>")
+    print ("3. Build from dockerfile and Run Containers          (-b)   -->  requires -f <DOCKER FILE> and -t <IMAGE TAG> ")
+    print ("4. Run container from existing image                 (-s)   -->  requires -i <IMAGE> and -t <IMAGE TAG> -n <COUNT>")
+    print ("\n Optional: \n Create and start gluster containers  (-g)   -->  Effective only with -s option ")
+    print ("\n                                                   (--gi) -->  To install Gluster From Source ")
+    print ("\n                                                   (--gv) -->  To auto configure Gluster Volume")
+
     print (60 * '-')
 
 
@@ -486,7 +489,7 @@ def main(dryr=0, dockit_log=dockit_log_file):
                      # dest="gluvolume", help="Gluster Volume Creation  inside containers  - Valid with -g option ", metavar="GLUSTERVOLUME")
 
     parser.add_option("--gi", "--glusterinstall",
-                      dest="gluinst", help="Install gluster inside containers  - Valid with -g option ", metavar="GLUSTERINSTALL")
+                      dest="gluinst", help="Install gluster inside containers  - Valid with -g option ", metavar="GLUSTERVERSION")
 
     logger.debug( "Dockit process logs are available at %s " % (dockit_log_file))
     options, arguments = parser.parse_args()
