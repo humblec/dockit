@@ -61,8 +61,8 @@ BRICKS="/brick6,/brick7,/brick8,/brick9"
 
 ```
 
-When -g is enabled, when invoking 'dockit' binary it will ask for below information, how-ever if want to read these inputs
-from configuration file , it is also possible (... -g -c '/home/hchiramm/configfile'):
+When invoking 'dockit' binary , If -g is enabled with --gv option , it will ask for below information, how-ever if you want to read these inputs
+from configuration file , it is also possible (... -g -c '/home/hchiramm/configfile') by giving config file as an input:
 ```
 Gluster Volume Type (ex: 2x2x1 where (distribute,replica, stripe count in order)     :2x2x1
 Gluster Volume Name (ex: glustervol)     :myvol
@@ -70,13 +70,13 @@ Gluster Export Dir Name (ex: /rhs_bricks)    :/humble
 Gluster brick file (ex: /home/configfile)    :/configfile
 ```
 
-Where 'Volume Type' is the configuration of gluster deployement which you wish.. Volume name is self explanatory and 'Export Dir Name' will be the mount point inside the containers where brick is configured. The brick file is mentioned above.
+Where 'Volume Type' is the configuration of gluster configurtion wrt distribut-replica-stripe.. Volume name is self explanatory and 'Export Dir Name' will be the mount point inside the containers where brick is configured. The brick file is mentioned above.
 For ex: If you give options like '2x2x1' which means it create 4 containers and brick names will be fetched in order from above config file. Make sure you have equal number of entries in your config file against the number of gluster containers you wish to spawn..
 
 
 
 
-Step 7: Use it and Report bugs/comment/suggestions/rfes @humble.devassy@gmail.com , if you come across any. 
+Step 7: Use it and Report bugs/comment/suggestions/RFEs @humble.devassy@gmail.com , if you come across any.
 
 
 #### TODO:
@@ -92,18 +92,22 @@ Lets run this executable:
 ------------------------------------------------------------
    M A I N - M E N U - O F - DOCKIT
 ------------------------------------------------------------
-You should invoke dockit with any of (-d , -p, -b, -s) options 
+Invoke dockit with any of (-d , -p, -b, -s) options
 
-1. Install and Run Docker deamon                  (-d) -->  dryrun   
-2. Pull image from docker repo and Run containers (-p) -->  requires -i <IMAGE> and -r <DOCKERREPO>
-3. Build from dockerfile and Run Containers       (-b) -->  requires -f <DOCKER FILE> and -t <IMAGE TAG> 
-4. Run container from existing image              (-s) -->  requires -i <IMAGE> and -t <IMAGE TAG> -n <COUNT>
-Optional: Create and start gluster containers     (-g) -->  Effective only with -s option
+1. Install and Run Docker deamon                     (-d)   -->  dryrun
+2. Pull image from docker repo and Run containers    (-p)   -->  requires -i <IMAGE> and -r <DOCKERREPO>
+3. Build from dockerfile and Run Containers          (-b)   -->  requires -f <DOCKER FILE> and -t <IMAGE TAG>
+4. Run container from existing image                 (-s)   -->  requires -i <IMAGE> and -t <IMAGE TAG> -n <COUNT>
+
+ Optional:
+ Create and start gluster containers  (-g)   -->  Effective only with -s option
+
+                                                   (--gi) -->  To install Gluster From Source
+
+                                                   (--gv) -->  To auto configure Gluster Volume
 ------------------------------------------------------------
 None
-Dockit process logs are available at /var/log/dockit.log 
-Would you like to continue? (y/n)y
-Continuing..
+dockit      : INFO     Dockit starting..
 Usage: dockit [options]
 
 Options:
@@ -115,276 +119,254 @@ Options:
                         and tag
   -b, --buildimage      Whether to build image from the dockerfile? Need to
                         specify dockerfile path, and imagetag
+  -g, --gluster_mode    Configure gluster volume in containers
   -i IMAGE, --image=IMAGE
                         Image name  - Containers will be based on this image
   -t IMAGETAG, --imgtag=IMAGETAG
                         Image tag name  - Containers will be assigned this tag
   -n COUNT, --count=COUNT
                         Number of containers to start  -
+  -c CONFIGFILE, --configfile=CONFIGFILE
+                        COnfig file path to read gluster configuration  -
   -f DOCKERFILE, --dockerfile=DOCKERFILE
                         Docker file path to build the container  -
   -r DOCKERREPO, --dockerrepo=DOCKERREPO
                         Docker repository name with a trailing blackslash  -
+  --gv, --glustervolume
+                        Gluster Volume Creation  inside containers  - Valid
+                        with -g option
+  --gi=GLUSTERVERSION, --glusterinstall=GLUSTERVERSION
+                        Install gluster inside containers  - Valid with -g
+                        option
+
 
 
 ```
 
 If we run the binary with options:
 
-Example 1: Below example ask 'dockit' to pull image (-p) called 'fed20-gluster' from docker repo (-r) 'humble' with tag 'latest' 
-and start (-s) 3 (-n 3) containers , then deploy gluster!! If you have enabled '-g' the number of containers ( 3 here) are masked
-and the configuration will be based on the input like '2x2x1' which will be fetched as soon as you start the binary.
-  
+Example 1: Pull an image (fed20-gluster) from docker repo (humble) and start 3 containers from it.
 
-```
-
-[root@humbles-lap dockit]# dockit -p -i fed20-gluster -r humble -s -n 3 -g
-------------------------------------------------------------
-   M A I N - M E N U - O F - DOCKIT
-------------------------------------------------------------
-Invoke dockit with any of (-d , -p, -b, -s) options 
-
-1. Install and Run Docker deamon                  (-d) -->  dryrun   
-2. Pull image from docker repo and Run containers (-p) -->  requires -i <IMAGE> and -r <DOCKERREPO>
-3. Build from dockerfile and Run Containers       (-b) -->  requires -f <DOCKER FILE> and -t <IMAGE TAG> 
-4. Run container from existing image              (-s) -->  requires -i <IMAGE> and -t <IMAGE TAG> -n <COUNT>
-Optional: Create and start gluster containers     (-g) -->  Effective only with -s option
-------------------------------------------------------------
-None
-INFO:root:Dockit process logs are available at /var/log/dockit.log 
-DEBUG:root:Input 	 :[['count', '3'], ['image', 'fed20-gluster'], ['glumode', True], ['pullimg', True], ['startc', True], ['dockerrepo', 'humble']]
-INFO:root:image tag : latest , docker repo:humble
-Do you want to continue (y/n)y
-Proceeding 
-INFO:root:
- Need to configure gluster volumes, taking inputs 
-Gluster Volume Type (ex: 2x2x1 where (distribute,replica, stripe count in order)	 :2x2x1
-Gluster Volume Name (ex: glustervol)	 :myvol
-Gluster Export Dir Name (ex: /rhs_bricks)	 :/humble
-Gluster brick file (ex: /home/configfile)	 :/configfile
-No of gluster containers to spawn:4
-Do you want to continue (y/n):y
-Continuing with..
-{'BRICKS': '/brick6,/brick7,/brick8,/brick9', 'VOLNAME': 'myvol', 'BRICK_FILE': '/configfile', 'SERVER_EXPORT_DIR': '/humble', 'VOL_TYPE': '2x2x1'}
-Loaded plugins: langpacks, refresh-packagekit
-Containers: 51
-Images: 19
-Driver: devicemapper
- Pool Name: docker-253:1-1051107-pool
- Data file: /var/lib/docker/devicemapper/devicemapper/data
- Metadata file: /var/lib/docker/devicemapper/devicemapper/metadata
- Data Space Used: 3378.4 Mb
- Data Space Total: 102400.0 Mb
- Metadata Space Used: 5.9 Mb
- Metadata Space Total: 2048.0 Mb
- Successfully connected to docker deamon: 
-
-May perform any action : pull/build/start containers according to the input
-Done with pulling....continuing
-Going to run the containers
-  Information about running containers 
-
- Ip address :172.17.0.14
-
- Ip address :172.17.0.15
-
- Ip address :172.17.0.16
-
- Ip address :172.17.0.17
-
-  Containers are running successfully.. please login and work!!!!
-Received below configuration from caller
-{'SERVER_IP_ADDRS': [u'172.17.0.14', u'172.17.0.15', u'172.17.0.16', u'172.17.0.17'], 'SERVER_EXPORT_DIR': '/humble', 'VOLNAME': 'myvol', 'VOL_TYPE': '2x2x1', 'TRANS_TYPE': 'tcp'}
-nodes are [u'172.17.0.14', u'172.17.0.15', u'172.17.0.16', u'172.17.0.17']
-Number of nodes: 4
-number of bricks:4
-command to execute: pgrep glusterd || glusterd
-node: 172.17.0.14
-command: pgrep glusterd || glusterd
-exit status: 0
-
-
-------------------------------------------------------------
-
-
-
-command to execute: pgrep glusterd || glusterd
-node: 172.17.0.15
-command: pgrep glusterd || glusterd
-exit status: 0
-
-
-------------------------------------------------------------
-
-
-
-command to execute: pgrep glusterd || glusterd
-node: 172.17.0.16
-command: pgrep glusterd || glusterd
-exit status: 0
-
-
-------------------------------------------------------------
-
-
-
-command to execute: pgrep glusterd || glusterd
-node: 172.17.0.17
-command: pgrep glusterd || glusterd
-exit status: 0
-
-
-------------------------------------------------------------
-
-
-
-command to execute: gluster peer probe 172.17.0.15
-command to execute: gluster peer probe 172.17.0.16
-command to execute: gluster peer probe 172.17.0.17
-command to execute: gluster --mode=script volume create myvol replica 2  transport tcp 172.17.0.14:/humble/myvol_brick0 172.17.0.15:/humble/myvol_brick1 172.17.0.16:/humble/myvol_brick2 172.17.0.17:/humble/myvol_brick3 force
-node: 172.17.0.14
-command: gluster --mode=script volume create myvol replica 2  transport tcp 172.17.0.14:/humble/myvol_brick0 172.17.0.15:/humble/myvol_brick1 172.17.0.16:/humble/myvol_brick2 172.17.0.17:/humble/myvol_brick3 force
-exit status: 0
-volume create: myvol: success: please start the volume to access data
-
-
-------------------------------------------------------------
-
-
-
-command to execute: gluster --mode=script volume start myvol
-Dockit finished...
-```
-Now, login and verify :)
-
-```
-[root@gprfc034 dockit]# ssh root@172.17.0.16
-The authenticity of host '172.17.0.16 (172.17.0.16)' can't be established.
-RSA key fingerprint is c0:b6:86:7a:b6:61:21:f1:05:16:ee:62:c1:e8:d4:1f.
-Are you sure you want to continue connecting (yes/no)? yes
-Warning: Permanently added '172.17.0.16' (RSA) to the list of known hosts.
-root@172.17.0.16's password: 
-[root@bc4b4f1d0433 ~]# ls
-
-
-[root@gprfc034 brick8]# ssh root@172.17.0.16
-root@172.17.0.16's password: 
-Last login: Wed Jun  4 15:52:06 2014 from 172.17.42.1
-[root@bc4b4f1d0433 ~]# gluster v i
- 
-Volume Name: myvol
-Type: Distributed-Replicate
-Volume ID: a9cab755-d924-47a7-b358-e664d0626bc0
-Status: Started
-Number of Bricks: 2 x 2 = 4
-Transport-type: tcp
-Bricks:
-Brick1: 172.17.0.14:/humble/myvol_brick0
-Brick2: 172.17.0.15:/humble/myvol_brick1
-Brick3: 172.17.0.16:/humble/myvol_brick2
-Brick4: 172.17.0.17:/humble/myvol_brick3
-[root@bc4b4f1d0433 ~]# 
-
-```
-
-Now 'glustervol' can be mounted in client as shown below:
-
-```
-[root@gprfc034 root]# mkdir /m
-[root@gprfc034 root]# mount -t glusterfs 172.17.0.14:/myvol /m
-[root@gprfc034 root]# cd /m
-[root@gprfc034 m]# ls
-[root@gprfc034 m]#
-
-```
-
-If you specify the option to read from config file as shown below, it will be more automated.
-
-```
-[root@humbles-lap dockit]# dockit -p -i fed20-gluster -r humble -s -n 3 -g -c /home/hchiramm/config
+[root@humbles-lap dockit]#  dockit -p -i fed20-gluster -r humble -s -n 3
 ------------------------------------------------------------
    M A I N - M E N U - O F - DOCKIT
 ------------------------------------------------------------
 Invoke dockit with any of (-d , -p, -b, -s) options
 
-1. Install and Run Docker deamon                  (-d) -->  dryrun
-2. Pull image from docker repo and Run containers (-p) -->  requires -i <IMAGE> and -r <DOCKERREPO>
-3. Build from dockerfile and Run Containers       (-b) -->  requires -f <DOCKER FILE> and -t <IMAGE TAG>
-4. Run container from existing image              (-s) -->  requires -i <IMAGE> and -t <IMAGE TAG> -n <COUNT>
-Optional: Create and start gluster containers     (-g) -->  Effective only with -s option
+1. Install and Run Docker deamon                     (-d)   -->  dryrun
+2. Pull image from docker repo and Run containers    (-p)   -->  requires -i <IMAGE> and -r <DOCKERREPO>
+3. Build from dockerfile and Run Containers          (-b)   -->  requires -f <DOCKER FILE> and -t <IMAGE TAG>
+4. Run container from existing image                 (-s)   -->  requires -i <IMAGE> and -t <IMAGE TAG> -n <COUNT>
+
+ Optional:
+ Create and start gluster containers  (-g)   -->  Effective only with -s option
+
+                                                   (--gi) -->  To install Gluster From Source
+
+                                                   (--gv) -->  To auto configure Gluster Volume
 ------------------------------------------------------------
 None
-INFO:root:Dockit process logs are available at /var/log/dockit/dockit.log
-INFO:root:image tag : latest , docker repo:humble
-Do you want to continue (y/n)Proceeding
-INFO:root:
- Need to configure gluster volumes, taking inputs
+dockit      : INFO     Dockit starting..
+Do you want to continue (y/n)y
+dockit      : INFO     Proceeding
+dockit      : INFO     Run containers natively, no mode configured
+dockit      : INFO     Distribution:fedora Required ['docker-io', 'python-docker-py'] packages
+ 	 	 	 Making yum transactions
+Loaded plugins: langpacks, refresh-packagekit, versionlock
+Requirement already up-to-date: docker-py in /usr/lib/python2.7/site-packages
+Requirement already up-to-date: requests==2.2.1 in /usr/lib/python2.7/site-packages/requests-2.2.1-py2.7.egg (from docker-py)
+Requirement already up-to-date: six>=1.3.0 in /usr/lib/python2.7/site-packages (from docker-py)
+Requirement already up-to-date: websocket-client==0.11.0 in /usr/lib/python2.7/site-packages/websocket_client-0.11.0-py2.7.egg (from docker-py)
+Requirement already up-to-date: mock==1.0.1 in /usr/lib/python2.7/site-packages (from docker-py)
+Cleaning up...
+dockit      : INFO     Successfully pulled docker image:humble/fed20-gluster
+root        : INFO     Enable Gluster Volume :0
+dockit      : INFO       Information about running containers
+dockit      : INFO     Containers are running successfully.. please login and work!!!!
+------------------------------------------------------------
+dockit      : INFO     Details about running containers..
 
-Reading gluster configuration from config file
-{'BRICKS': '/brick3,/brick6,/brick7,/brick8', 'VOLNAME': 'MYGLUSTER', 'VOL_TYPE': '1x2x1'}
-INFO:root:No of gluster containers to spawn:2
-Do you want to continue (y/n):y
-Configuration read from configuration file
-Continuing with..
-{'BRICKS': '/brick3,/brick6,/brick7,/brick8', 'VOLNAME': 'MYGLUSTER', 'SERVER_EXPORT_DIR': 'default_server_Export', 'VOL_TYPE': '1x2x1'}
+dockit      : INFO     Container IPs 	 : [u'172.17.0.55', u'172.17.0.56', u'172.17.0.57']
 
-.................
+dockit      : INFO     Container Ids 	 : [u'8ee194a323d7a28bfd70490c87bfbe3c76f48d578a24f89b063532874eceed77', u'8ee194a323d7a28bfd70490c87bfbe3c76f48d578a24f89b063532874eceed77', u'8ee194a323d7a28bfd70490c87bfbe3c76f48d578a24f89b063532874eceed77']
 
-INFO:root:Details about running containers..
+------------------------------------------------------------
+dockit      : INFO     Done!
 
-INFO:root:Container IPs 	 : [u'172.17.0.2', u'172.17.0.3']
-
-INFO:root:Container Ids 	 : [u'1c4a2d72892186f5f68225be5c59f96872c5fcfdd3e8406a2cfe2e5dc26caf2c', u'1c4a2d72892186f5f68225be5c59f96872c5fcfdd3e8406a2cfe2e5dc26caf2c']
-
- ...........
 ```
 
-Example 2: Below example ask 'dockit' to build (-b) a new image using docker file (-f) /home/hchiramm/dockit/dockerfiles and tag it to 'mynewgluster'(-t) and start (-s) containers from it.
+
+Example 2:
+
+Start 4 containers using image humble/fed20-gluster with tag 'latest' and run in gluster mode and auto start volume by reading configuration from file /home/hchiramm/config
+
+Where /home/hchiramm/config has below entries:
+
+
 
 ```
-
-[root@humbles-lap dockit]# dockit -b -t mynewgluster -f /home/hchiramm/dockit/dockerfiles/ -s 1 
-Dockit process logs are available at /var/log/dockit.log 
+[root@humbles-lap dockit]# dockit -i humble/fed20-gluster -t latest -s -n 4 -g -c /home/hchiramm/config --gv
 ------------------------------------------------------------
    M A I N - M E N U - O F - DOCKIT
 ------------------------------------------------------------
-1. Install and Run Docker                             --> Configure: dryrun   (-d) option 
-2. Pull image from docker repo and Run container      --> Configure: pullimg  (-p) option 
-3. Build from dockerfile and Run Container            --> Configure: buildimg (-b) option
-4. Run container from existing image                  --> Configure: startC   (-s) option
-Optional: Create and start gluster containers     (-g) -->  Effective only with -s option
+Invoke dockit with any of (-d , -p, -b, -s) options
+
+1. Install and Run Docker deamon                     (-d)   -->  dryrun
+2. Pull image from docker repo and Run containers    (-p)   -->  requires -i <IMAGE> and -r <DOCKERREPO>
+3. Build from dockerfile and Run Containers          (-b)   -->  requires -f <DOCKER FILE> and -t <IMAGE TAG>
+4. Run container from existing image                 (-s)   -->  requires -i <IMAGE> and -t <IMAGE TAG> -n <COUNT>
+
+ Optional:
+ Create and start gluster containers  (-g)   -->  Effective only with -s option
+
+                                                   (--gi) -->  To install Gluster From Source
+
+                                                   (--gv) -->  To auto configure Gluster Volume
 ------------------------------------------------------------
-........ [truncated]
+None
+dockit      : INFO     Dockit starting..
 Do you want to continue (y/n)y
-Proceeding 
+dockit      : INFO     Proceeding
+dockit      : INFO
+ Need to configure gluster volume..
+
+dockit      : INFO     Reading gluster configuration from config file
+{'BRICKS': '/brick9,/brick10,/brick11,/brick12', 'VOLNAME': 'DemoVolume', 'VOL_TYPE': '2x2x1'}
+dockit      : INFO     No of gluster containers to spawn:4
+Do you want to continue (y/n):y
+dockit      : INFO     Configuration read from configuration file
+dockit      : INFO     {'BRICKS': '/brick9,/brick10,/brick11,/brick12', 'VOLNAME': 'DemoVolume', 'SERVER_EXPORT_DIR': 'default_server_Export', 'VOL_TYPE': '2x2x1'}
+dockit      : INFO     Distribution:fedora Required ['docker-io', 'python-docker-py'] packages
+ 	 	 	 Making yum transactions
 Loaded plugins: langpacks, refresh-packagekit, versionlock
-Containers: 6
-Images: 89
-Storage Driver: devicemapper
- Pool Name: docker-8:10-1063742-pool
- Data file: /var/lib/docker/devicemapper/devicemapper/data
- Metadata file: /var/lib/docker/devicemapper/devicemapper/metadata
- Data Space Used: 2439.8 Mb
- Data Space Total: 102400.0 Mb
- Metadata Space Used: 3.8 Mb
- Metadata Space Total: 2048.0 Mb
-Execution Driver: native-0.1
-Kernel Version: 3.10.4-300.fc19.x86_64
-Username: humble
-Registry: [https://index.docker.io/v1/]
-WARNING: No swap limit support
- Successfully connected to docker deamon: 
+Requirement already up-to-date: docker-py in /usr/lib/python2.7/site-packages
+Requirement already up-to-date: requests==2.2.1 in /usr/lib/python2.7/site-packages/requests-2.2.1-py2.7.egg (from docker-py)
+Requirement already up-to-date: six>=1.3.0 in /usr/lib/python2.7/site-packages (from docker-py)
+Requirement already up-to-date: websocket-client==0.11.0 in /usr/lib/python2.7/site-packages/websocket_client-0.11.0-py2.7.egg (from docker-py)
+Requirement already up-to-date: mock==1.0.1 in /usr/lib/python2.7/site-packages (from docker-py)
+Cleaning up...
+dockit      : INFO     Bricks will be using in order:['/brick9', '/brick10', '/brick11', '/brick12']
+root        : INFO     Enable Gluster Volume :1
+...
+...
+...
+...
+dockit      : INFO       Information about running containers
+dockit      : INFO     Containers are running successfully.. please login and work!!!!
+------------------------------------------------------------
+dockit      : INFO     Details about running containers..
 
-May perform any action : pull/build/start containers according to the input
-Continuing build process with /home/hchiramm/dockit/dockerfiles/
+dockit      : INFO     Container IPs 	 : [u'172.17.0.60', u'172.17.0.61', u'172.17.0.62', u'172.17.0.63']
 
-Going to run the containers
-  Information about running containers 
+dockit      : INFO     Container Ids 	 : [u'0fa6d87f17fae00b91c7be15ea843c74c2ac46f8dfbd615c7d557d491caaa58d', u'0fa6d87f17fae00b91c7be15ea843c74c2ac46f8dfbd615c7d557d491caaa58d', u'0fa6d87f17fae00b91c7be15ea843c74c2ac46f8dfbd615c7d557d491caaa58d', u'0fa6d87f17fae00b91c7be15ea843c74c2ac46f8dfbd615c7d557d491caaa58d']
 
- Ip address :172.17.0.5
+------------------------------------------------------------
+dockit      : INFO     Gluster installation not required
+dockit      : INFO     nodes are [u'172.17.0.61', u'172.17.0.60', u'172.17.0.63', u'172.17.0.62']
+dockit      : INFO     Number of nodes: 4
+dockit      : INFO     number of bricks:4
 
-  Containers are running successfully.. please login and work!!!!
-Dockit finished...
+.....
+root        : INFO     Gluster Volume operations done
+
+
+[root@dcd54b4a9463 /]# gluster
+gluster> pool list
+UUID					Hostname	State
+cfa0dce8-9090-4a04-9e4d-74a2e37b49a4	172.17.0.60	Connected
+cebac333-cfd8-4dbc-954a-6c2be0b16f7b	172.17.0.63	Connected
+ee9b942f-2cb7-4af5-a14b-6fb212c8000b	172.17.0.62	Connected
+2e1a6fae-a053-44ac-b0bc-7e1783cce6b4	localhost	Connected
+
+
+```
+
+
+Example 3: Install 3.4 gluster binary on 2 containers started using humble/fed20-gluster images.
+
+```
+[root@humbles-lap dockit]# dockit -i humble/fed20-gluster -t latest -s -n 2 -g -c /home/hchiramm/config --gi 3.4
+------------------------------------------------------------
+   M A I N - M E N U - O F - DOCKIT
+------------------------------------------------------------
+Invoke dockit with any of (-d , -p, -b, -s) options
+
+1. Install and Run Docker deamon                     (-d)   -->  dryrun
+2. Pull image from docker repo and Run containers    (-p)   -->  requires -i <IMAGE> and -r <DOCKERREPO>
+3. Build from dockerfile and Run Containers          (-b)   -->  requires -f <DOCKER FILE> and -t <IMAGE TAG>
+4. Run container from existing image                 (-s)   -->  requires -i <IMAGE> and -t <IMAGE TAG> -n <COUNT>
+
+ Optional:
+ Create and start gluster containers  (-g)   -->  Effective only with -s option
+
+                                                   (--gi) -->  To install Gluster From Source
+
+                                                   (--gv) -->  To auto configure Gluster Volume
+------------------------------------------------------------
+None
+dockit      : INFO     Dockit starting..
+Do you want to continue (y/n)y
+dockit      : INFO     Proceeding
+dockit      : INFO     Need to install gluster inside containers
+dockit      : INFO     Distribution:fedora Required ['docker-io', 'python-docker-py'] packages
+ 	 	 	 Making yum transactions
+Loaded plugins: langpacks, refresh-packagekit, versionlock
+Requirement already up-to-date: docker-py in /usr/lib/python2.7/site-packages
+Requirement already up-to-date: requests==2.2.1 in /usr/lib/python2.7/site-packages/requests-2.2.1-py2.7.egg (from docker-py)
+Requirement already up-to-date: six>=1.3.0 in /usr/lib/python2.7/site-packages (from docker-py)
+Requirement already up-to-date: websocket-client==0.11.0 in /usr/lib/python2.7/site-packages/websocket_client-0.11.0-py2.7.egg (from docker-py)
+Requirement already up-to-date: mock==1.0.1 in /usr/lib/python2.7/site-packages (from docker-py)
+Cleaning up...
+root        : INFO     Enable Gluster Volume :0
+dockit      : INFO       Information about running containers
+dockit      : INFO     Containers are running successfully.. please login and work!!!!
+------------------------------------------------------------
+dockit      : INFO     Details about running containers..
+
+dockit      : INFO     Container IPs 	 : [u'172.17.0.73', u'172.17.0.74']
+
+dockit      : INFO     Container Ids 	 : [u'3930da92c5d15948452fbd4b7332747576bf1d88d1fc4ce7cf631c72296e2c52', u'3930da92c5d15948452fbd4b7332747576bf1d88d1fc4ce7cf631c72296e2c52']
+
+------------------------------------------------------------
+dockit      : INFO     Trying to install gluster on [u'172.17.0.74', u'172.17.0.73'] nodes
+dockit      : INFO     Configuring/installing on node:172.17.0.74
+
+dockit      : INFO     Continuing ..
+
+dockit      : INFO     Successfully configured GlusterFS binary on node:172.17.0.74
+dockit      : INFO     Configuring/installing on node:172.17.0.73
+
+dockit      : INFO     Successfully configured GlusterFS binary on node:172.17.0.73
+dockit      : INFO     Successful Gluster Package Installation and GlusterFS Binary installation on all the nodes!
+dockit      : INFO     Gluster Volume creation not required
+
+```
+So glusterd binary has been installed on above containers with '3.4' version.
+
+Lets confirm:
+
+```
+ssh root[hchiramm@humbles-lap dockit]$ ssh root@172.17.0.74
+root@172.17.0.74's password:
+Last login: Sun Jul 13 17:55:20 2014 from 172.17.42.1
+[root@2a04bf9182ad ~]# gluster
+gluster     glusterd    glusterfs/  glusterfsd
+[root@2a04bf9182ad ~]# glusterd --version
+glusterfs 3.4git built on Jul 13 2014 18:11:48
+Repository revision: git://git.gluster.com/glusterfs.git
+Copyright (c) 2006-2013 Red Hat, Inc. <http://www.redhat.com/>
+GlusterFS comes with ABSOLUTELY NO WARRANTY.
+It is licensed to you under your choice of the GNU Lesser
+General Public License, version 3 or any later version (LGPLv3
+or later), or the GNU General Public License, version 2 (GPLv2),
+in all cases as published by the Free Software Foundation.
+[root@2a04bf9182ad ~]#
+```
+
+
+
+
+
 
 ```
 
@@ -396,7 +378,7 @@ Dockit finished...
 
 Example DockerFiles: 
 
-1
+
 
 
 ```

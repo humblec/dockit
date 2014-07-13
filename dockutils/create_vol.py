@@ -80,11 +80,11 @@ class glusteractions():
                    python-webob pyxattr readline-devel rpm-build gdb dbench \
                    net-tools systemtap-sdt-devel attr psmisc findutils which \
                    xfsprogs yajl-devel lvm2-devel e2fsprogs mock nfs-utils \
-                   openssh-server supervisor openssl fuse-libs wget'
+                   openssh-server supervisor openssl fuse-libs wget >/dev/null'
         #gluster_package_command='ls'
         #gluster_install_command = 'cd /root/glusterfs && make install'
         gluster_install_command = "rm -rf /root/glusterfs && cd /root && git clone git://review.gluster.org/glusterfs && cd glusterfs && \
-                                 git checkout -b %s origin/release-%s  && ./autogen.sh && ./configure && make >/dev/null && make install> /dev/null " %(version, version)
+                                 git checkout -b %s origin/release-%s  && ./autogen.sh >/dev/null && ./configure>/dev/null && make >/dev/null && make install> /dev/null " %(version, version)
 
 
         for node in nodes:

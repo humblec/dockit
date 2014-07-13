@@ -196,7 +196,7 @@ def run_command(node, cmd, verbose):
         ferr = chan.makefile_stderr('rb')
         ret_code = chan.recv_exit_status()
         if verbose == True:
-            logger.debug ("node: %s ->  exit status: %d ", node, ret_code)
+            logger.debug ("node: %s -> cmd: %s ->  exit status: %d ", node,cmd, ret_code)
             # print cmd
             print '\n' + fout.read() +ferr.read()
            # logger.debug("%s ",fout.read())

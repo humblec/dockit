@@ -579,8 +579,8 @@ def main(dryr=0, dockit_log=dockit_log_file):
                             volumeconfig = re.search(r'([0-9]+)x([0-9]+)x([0-9]+)', g_voltype)
                         else:
                             gluster_config['VOL_TYPE'] = gluster_config.get('VOL_TYPE', '1x2x1')
-                            gluster_config['VOLNAME']=gluster_config.get('VOLNAME', 'default_vol')
-                            gluster_config['SERVER_EXPORT_DIR']=gluster_config.get('SERVER_EXPORT_DIR','default_server_Export')
+                            gluster_config['VOLNAME']=gluster_config.get('VOLNAME', 'defaultVol')
+                            gluster_config['SERVER_EXPORT_DIR']=gluster_config.get('SERVER_EXPORT_DIR','defaultExport')
                             volumeconfig = re.search(r'([0-9]+)x([0-9]+)x([0-9]+)',gluster_config['VOL_TYPE'])
                         distributecount = volumeconfig.group(1)
                         replicacount = volumeconfig.group(2)
