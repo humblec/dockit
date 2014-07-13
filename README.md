@@ -138,15 +138,13 @@ Options:
   --gi=GLUSTERVERSION, --glusterinstall=GLUSTERVERSION
                         Install gluster inside containers  - Valid with -g
                         option
-
-
-
 ```
 
 If we run the binary with options:
 
 Example 1: Pull an image (fed20-gluster) from docker repo (humble) and start 3 containers from it.
 
+```
 [root@humbles-lap dockit]#  dockit -p -i fed20-gluster -r humble -s -n 3
 ------------------------------------------------------------
    M A I N - M E N U - O F - DOCKIT
@@ -247,10 +245,7 @@ Requirement already up-to-date: mock==1.0.1 in /usr/lib/python2.7/site-packages 
 Cleaning up...
 dockit      : INFO     Bricks will be using in order:['/brick9', '/brick10', '/brick11', '/brick12']
 root        : INFO     Enable Gluster Volume :1
-...
-...
-...
-...
+
 dockit      : INFO       Information about running containers
 dockit      : INFO     Containers are running successfully.. please login and work!!!!
 ------------------------------------------------------------
@@ -266,7 +261,7 @@ dockit      : INFO     nodes are [u'172.17.0.61', u'172.17.0.60', u'172.17.0.63'
 dockit      : INFO     Number of nodes: 4
 dockit      : INFO     number of bricks:4
 
-.....
+
 root        : INFO     Gluster Volume operations done
 
 
@@ -364,24 +359,10 @@ in all cases as published by the Free Software Foundation.
 ```
 
 
-
-
-
+Example DockerFiles:
 
 ```
 
-
-
-==============================================================
-
-
-
-Example DockerFiles: 
-
-
-
-
-```
 ############################################################
 # Dockerfile to run Gluster Containers
 # Part of dockit project :https://github.com/humblec/dockit
