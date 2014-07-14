@@ -233,7 +233,7 @@ dockit      : INFO     Reading gluster configuration from config file
 dockit      : INFO     No of gluster containers to spawn:4
 Do you want to continue (y/n):y
 dockit      : INFO     Configuration read from configuration file
-dockit      : INFO     {'BRICKS': '/brick9,/brick10,/brick11,/brick12', 'VOLNAME': 'DemoVolume', 'SERVER_EXPORT_DIR': 'default_server_Export', 'VOL_TYPE': '2x2x1'}
+dockit      : INFO     {'BRICKS': '/brick9,/brick10,/brick11,/brick12', 'VOLNAME': 'DemoVolume', 'SERVER_EXPORT_DIR': '/default_server_Export', 'VOL_TYPE': '2x2x1'}
 dockit      : INFO     Distribution:fedora Required ['docker-io', 'python-docker-py'] packages
  	 	 	 Making yum transactions
 Loaded plugins: langpacks, refresh-packagekit, versionlock
