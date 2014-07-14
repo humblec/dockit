@@ -23,7 +23,7 @@ You can use this (dockit)executable for:
 can install docker packages, yum transactions performed by this binary is very sensitive on minor errors like repodata error..etc
 I am looking for alternatives.
 * Base/official image 'pulling' (ex: ubuntu official image) is disabled for this version.  How-ever if you have specified base image in docker file, it should work..
-* The image which you use for gluster deployment should have "ssh" deamon running in it.
+* The image which you use for gluster deployment should have "ssh" deamon running in it with ssh password 'redhat'.
  An example image can be found @https://index.docker.io/u/humble/fed20-gluster/
 * Finally read the "help" output to use this in its full strength.
 * When running this binary it may require 'image tag' at times, you can use default tag called 'latest' if you dont have any other choice.
@@ -57,6 +57,8 @@ Step 6: If you are planning to use it for gluster deployment ( -g option flag of
 ```
 [root@ dockit]# cat /configfile 
 BRICKS="/brick6,/brick7,/brick8,/brick9"
+VOL_TYPE="2x2x1"
+VOLNAME="DemoVolume"
 [root@dockit]# 
 
 ```
@@ -81,7 +83,8 @@ Step 7: Use it and Report bugs/comment/suggestions/RFEs @humble.devassy@gmail.co
 
 #### TODO:
 
-[Fill later]
+* Remove pre-defined ssh password dependency on the image.
+[list to be filled later]
 
 
 Lets run this executable:
