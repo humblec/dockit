@@ -51,19 +51,10 @@ gluster_config={}
 globalopts={}
 
 
-
-#fedora_req_pcks = ["docker-io", "python-docker-py"]
-#gluster_flag=0
-#gluster_config = {'VOL_TYPE':'1x2x1', 'VOLNAME':'glustervol1','SERVER_EXPORT_DIR':'/rhs_bricks' }
-
-
-
 def talktoDocker(pulloption, baseimage, imagetag, numcontainers, dockerfile, dockerrepo, buildoption, startoption, gluster_mode, gluster_install, gluster_volume):
-    new_image_tag=''
 
-    flag=0
-    flag1=0
-    gluster_flag=0
+    new_image_tag=''
+    flag= flag1 = gluster_flag = 0
     cons_ids=[]
     logger.debug("Docker image name :%s \t Image Tag:%s \t number of Containers:%s", baseimage, imagetag, numcontainers)
 
@@ -71,11 +62,11 @@ def talktoDocker(pulloption, baseimage, imagetag, numcontainers, dockerfile, doc
         connret = dockit.DockerCli("connect", pulloption, baseimage, imagetag, numcontainers,
                                    dockerfile, dockit_log_file, dockerrepo, buildoption)
         if connret:
-            logger.debug(" Successfully connected to docker deamon: \n"
-                         "  May perform action : pull/build/start containers according to the input")
+            logger.info("Successfully connected to docker deamon: \n"
+                         "\t \t \t pull/build/start containers accordingly.")
 
         else:
-            logger.debug("Connection return failed..exiting.")
+            logger.error("Connection return failed..exiting.")
 
             sys.exit(1)
 
@@ -87,22 +78,22 @@ def talktoDocker(pulloption, baseimage, imagetag, numcontainers, dockerfile, doc
             #    sys.exit(1)
             pullret = connret.pullC()
             if pullret:
-                logger.debug("Done with pulling.. continuing")
+                logger.info("Done with pulling.. continuing")
                 if dockerrepo and baseimage:
                     new_image_tag=dockerrepo+'/'+baseimage+':'+'latest'
                     flag1=1
                 logger.debug( "new_image_tag:%s", new_image_tag)
             else:
-                logger.debug("Error when pulling ")
+                logger.error("Error when pulling ")
                 #sys.exit(1)
         else:
-            logger.debug("Not trying to pull image:%s.. continuing", baseimage)
+            logger.info("Not trying to pull image:%s.. continuing", baseimage)
         if buildoption:
             logger.debug("Continuing build process with %s", dockerfile)
 
             built_image =  connret.buildC()
             if built_image:
-                logger.debug(" Image built from docker file :%s with id:%s and tag:%s",
+                logger.info(" Image built from docker file :%s with id:%s and tag:%s",
                              built_image, built_image['Id'],built_image['RepoTags'])
                 if imagetag:
                     logger.debug("Image tag:%s", imagetag)
@@ -111,7 +102,7 @@ def talktoDocker(pulloption, baseimage, imagetag, numcontainers, dockerfile, doc
                 logger.debug( "new_image_tag:%s", new_image_tag)
 
             else:
-                logger.debug("Failed when building from docker file:\nCheck docker file path and options ")
+                logger.error("Failed when building from docker file:\nCheck docker file path and options ")
 
         else:
             logger.debug ("Not trying to build the image from docker file")
@@ -130,7 +121,7 @@ def talktoDocker(pulloption, baseimage, imagetag, numcontainers, dockerfile, doc
 
             if ret_exist:
                 logger.debug("Image exists :%s with ID:%s  ", ret_exist, ret_exist['Id'])
-                logger.debug("Going to run the containers")
+                logger.info("Going to run the containers")
 
                 if gluster_mode:
                     if gluster_volume:
@@ -140,7 +131,7 @@ def talktoDocker(pulloption, baseimage, imagetag, numcontainers, dockerfile, doc
                 runret =  connret.runC(ret_exist['RepoTags'][0], gluster_flag, gluster_config, )
                 if runret:
                     if not connret.container_ips:
-                        logger.debug( "Something went wrong when spawning containers:exiting")
+                        logger.critical( "Something went wrong when spawning containers:exiting")
                         sys.exit(1)
 
 
@@ -179,9 +170,9 @@ def talktoDocker(pulloption, baseimage, imagetag, numcontainers, dockerfile, doc
                     	    run_helper.rh_config_dict['VOLNAME'] =gluster_config['VOLNAME']
                     	    logger.debug("Successfully filled configuration details:%s", run_helper.rh_config_dict)
                             gluster_cli.create_gluster_volume(start=True)
-                            logging.info('Gluster Volume operations done')
+                            logging.info('Gluster Volume operations done! Please mount volume :%s in your client', gluster_config['VOLNAME'])
                         else:
-                            logger.info("Gluster Volume creation not required")
+                            logger.debug("Gluster Volume creation not required")
                     else:
                         logger.info("Done!")
                 else:
@@ -192,14 +183,14 @@ def talktoDocker(pulloption, baseimage, imagetag, numcontainers, dockerfile, doc
                 sys.exit(1)
         else:
             logger.debug( "Not trying to start containers..")
-            logger.debug( "Dockit finished...")
+            logger.info( "Dockit finished...")
             return True
 
 
 
 
     except Exception as e:
-        logger.critical("Failed to talk to docker:%s", e)
+        logger.critical("Failed on :%s", e)
         sys.exit(1)
 
 
@@ -236,7 +227,7 @@ class Packageinst:
         except Exception as e:
             logger.debug(e)
             sys.exit(1)
-        logger.debug("Distribution:%s",sysdict['dist'])
+        logger.info("Distribution:%s",sysdict['dist'])
         return True
 
     def checkprereq(self):
@@ -253,18 +244,18 @@ class Packageinst:
             elif sysdict['dist'] == "centos":
                 req_pcks = list(centos_req_pcks)
             else:
-                logger.debug("Unknown Distribution for me")
+                logger.error("Unknown Distribution for me")
                 sys.exit(1)
 
-            logger.info("Distribution:%s Required %s packages \n \t \t \t Making yum transactions", sysdict['dist'], req_pcks)
+            logger.info("Distribution:%s Required %s packages \n\t \t \t Making yum transactions", sysdict['dist'], req_pcks)
             yb = yum.YumBase()
             yb.conf.cache = os.geteuid() != 1
             for pck in req_pcks:
                 if yb.rpmdb.searchNevra(name=pck):
-                    logger.debug("%20s -> Installed" % (pck))
+                    logger.info("%s -> Installed" % (pck))
                     avail_pcks.append(pck)
                 else:
-                    logger.debug("%30s -> not installed" % (pck))
+                    logger.info("%s -> not installed" % (pck))
                     mis_pcks.append(pck)
                     if not self.skipflag:
                         try:
@@ -274,21 +265,21 @@ class Packageinst:
                                 os.system(cmd)
                                 mis_pcks.remove(pck)
                             else:
-                                logger.debug("Unknown package for me to install via pip")
+                                logger.error("Unknown package for me to install via pip")
                         except Exception as e:
-                            logger.debug(e)
+                            logger.error(e)
                             logger.error("Error occurred when trying to install %s  using pip -> Try to install manually" % (pck))
                             sys.exit(1)
                         try:
                             yb.install(name=pck)
                             time.sleep(5)
                         except yum.Errors.InstallError, err:
-                            logger.debug("exiting : Error when installing package %s", pck)
-                            logger.debug("%s", (str(err)))
+                            logger.error("exiting : Error when installing package %s", pck)
+                            logger.error("%s", (str(err)))
                             sys.exit(1)
                         except Exception as e:
-                            logger.debug(e)
-                            logger.debug("Error occurred when trying to install %s -> Try to install manually" % (pck))
+                            logger.critical(e)
+                            logger.error("Error occurred when trying to install %s -> Try to install manually" % (pck))
                             sys.exit(1)
             if len(mis_pcks) > 0:
                 if self.skipflag:
@@ -302,11 +293,11 @@ class Packageinst:
                         yb.processTransaction()
                         return True
                     except Exception as e:
-                        logger.debug(
+                        logger.error(
                             "Exiting due to transaction failure:%s", e)
                         sys.exit(1)
         except Exception as e:
-            logger.debug("Exiting..%s", e)
+            logger.critical("Exiting..%s", e)
 
             sys.exit(1)
         return True
@@ -326,7 +317,7 @@ class Procstart:
                 self.cmd = 'systemctl start docker'
                 #self.cmd = 'docker -d'
             else:
-                logger.debug("Unknown process %s ..exiting" % (w))
+                logger.error("Unknown process %s ..exiting" % (w))
                 self.cmd = 'exit 1'
 
 
@@ -337,7 +328,7 @@ class Procstart:
             s = subprocess.Popen(["ps", "aux"], stdout=subprocess.PIPE)
             for prs in s.stdout:
                 if re.search(self.proc, prs):
-                    logger.debug(
+                    logger.info(
                         "Requested process: %s is running" % (self.proc))
                     return True
         except Exception as e:
@@ -443,7 +434,7 @@ def main(dryr=0, dockit_log=dockit_log_file):
 
     print print_menu()
    # create_logger()
-    logger.info("Dockit starting..")
+
     parser = OptionParser()
     parser.add_option("-d", "--dry_run",
                       action="store_true", dest="dry", default=False,
@@ -491,7 +482,8 @@ def main(dryr=0, dockit_log=dockit_log_file):
     parser.add_option("--gi", "--glusterinstall",
                       dest="gluinst", help="Install gluster inside containers  - Valid with -g option ", metavar="GLUSTERVERSION")
 
-    logger.debug( "Dockit process logs are available at %s " % (dockit_log_file))
+    logger.info("Dockit starting.. Process logs are available at:%s", dockit_log_file)
+
     options, arguments = parser.parse_args()
     globalopts=dict(options.__dict__)
 
@@ -506,7 +498,7 @@ def main(dryr=0, dockit_log=dockit_log_file):
 
     check = [o for o in anyopt if o]
     if not check:
-        logging.warn( "You missed one of the must required option..  reread and execute.... exiting .")
+        logging.error( "You missed one of the must required option..  reread and execute.... exiting .")
         #print_menu()
         sys.exit(1)
     if options.gluinst or options.gluvolume:
@@ -514,7 +506,7 @@ def main(dryr=0, dockit_log=dockit_log_file):
             logger.error("You can not use gluster actions without -g option")
             sys.exit(1)
     if options.glumode and not options.gluvolume and not options.gluinst:
-        logger.info("-g dont have any effect without --gv or --gi options")
+        logger.warn("-g dont have any effect without --gv or --gi options")
 
     final_true_list = [[key,value] for key,value in globalopts.items() if value != False if value != None]
     logger.debug("Input \t :%s" ,final_true_list)
@@ -536,12 +528,12 @@ def main(dryr=0, dockit_log=dockit_log_file):
             logger.debug("image tag : %s , docker repo:%s", options.imgtag, options.dockerrepo)
 
     if options.pullimg and options.buildimg:
-        logger.debug( "Only one at a time, pull or build")
+        logger.error( "Only one at a time, pull or build")
         sys.exit(1)
 
     for good in my_good:
         if not options.__dict__[good]:
-                logger.debug("\n \t Unfortunately  You Missed:%s", good)
+                logger.error("\n \t Unfortunately  You Missed:%s", good)
                 parser.print_help()
                 sys.exit(1)
 
@@ -613,7 +605,7 @@ def main(dryr=0, dockit_log=dockit_log_file):
 
                         logger.info("%s", gluster_config)
                     else:
-                        logger.debug( "Exiting.. Invoke dockit command with proper option of gluster mode")
+                        logger.error( "Exiting.. Invoke dockit command with proper option of gluster mode")
                         sys.exit(1)
             else:
                 logger.info( "Run containers natively, no mode configured")
@@ -623,7 +615,7 @@ def main(dryr=0, dockit_log=dockit_log_file):
             sys.exit(1)
 
     if options.dry:
-        logger.debug("Dry run : Dockit does not install any package")
+        logger.info("Dry run : Dockit will not attempt to install any package")
         dryr= 1
     else:
         logger.debug("Install packages if required, this is not a dry run...")
@@ -635,7 +627,7 @@ def main(dryr=0, dockit_log=dockit_log_file):
             ret = sysobj.checkprereq()
 
             if ret:
-                logger.debug("Pre-requisites are installed")
+                logger.info("Pre-requisites are installed")
             else:
                 logger.debug("Either install it or let me install ")
                 sys.exit(1)
@@ -645,9 +637,9 @@ def main(dryr=0, dockit_log=dockit_log_file):
             if not checkret:
                 ret = procd.execproc()
                 if ret:
-                    logger.debug("Successfully started docker deamon... ")
+                    logger.info("Successfully started docker deamon... ")
                 else:
-                    logger.debug('Exiting')
+                    logger.error('Exiting')
                     sys.exit(1)
             procd.infoproc()
             logger.debug("Connecting to the docker deamon")

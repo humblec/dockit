@@ -33,12 +33,9 @@ import time
 
 
 
-
+#todo:  Work on next api versions
 DOCK_SOCK = "unix://var/run/docker.sock"
 DOCK_VERSION = "1.8"
-
-
-#rh_config_dict={}
 
 failed_con=[]
 inspect_failed_con=[]
@@ -76,10 +73,6 @@ class DockerCli (docker.Client):
             self.dc = docker.Client(base_url=DOCK_SOCK,
                                     version=DOCK_VERSION,
                                     timeout=30)
-            #self.dc = docker.Client(base_url='unix://var/run/docker.sock',
-            #   version='1.10',
-            #   timeout=10)
-
             if self.dc:
 
                 dcinfo = self.dc.info()
@@ -89,7 +82,7 @@ class DockerCli (docker.Client):
                 logger.critical("Failed to get docker info:")
 
         except Exception as e:
-            logger.debug(e)
+            logger.error(e)
             sys.exit(1)
 
 
@@ -99,22 +92,24 @@ class DockerCli (docker.Client):
         """
          This pull input image
         """
+
         logger.debug(self.dock_pull)
         if self.dock_pull:
-            logger.debug("Trying to pull %s from docker repo:%s ... \n "
-                         "This can take some time, please wait...", self.dock_image, self.repository)
+            logger.info("Trying to pull %s from docker repo:%s ... \n "
+                         "\t \t \tThis can take some time, please wait...", self.dock_image, self.repository)
             if self.repository:
                 self.dock_image=self.repository+'/'+self.dock_image
             logger.debug("Repo+image:%s", self.dock_image)
             try:
                 ret = self.dc.pull(self.dock_image)
-                #if '404' in ret:
-                #    print "Failed when pulling image from docker repo"
-                #    logger.debug("Failed when pulling image from docker repo")
-                #    return False
-                #else:
-                logger.info("Successfully pulled docker image:%s" % (self.dock_image))
-                return True
+                #logger.debug("%s", ret)
+                if "404" in ret:
+                    logger.error("Failed to pull %s from provided docker repo", self.dock_image)
+                    return False
+                else:
+                    logger.info("Successfully pulled docker image:%s" % (self.dock_image))
+                    return True
+
             except Exception as e:
                 logger.critical("Failed to pull %s with an exception: %s", self.dock_image, e)
                 return False
@@ -160,7 +155,7 @@ class DockerCli (docker.Client):
         self.brick_ext = 0
         self.gflag=gl_flag
         self.brick_set=[]
-        logger.debug(" Create and start containers with image :%s ", self.c_tag)
+        logger.info(" Create and start containers with image :%s ", self.c_tag)
 
         if self.gflag:
             bricks =  gluster_dict['BRICKS']
@@ -184,6 +179,7 @@ class DockerCli (docker.Client):
                 # also stdin_open to True, for docker attach comand
                 # ctrl+P+Q can detach the container
                 # detach=False means it wont exit the shell ?
+
                 if self.gflag:
                     self.brick_mount=gluster_dict['SERVER_EXPORT_DIR']
                     if len(self.brick_set ) < self.dock_numc:
@@ -219,10 +215,12 @@ class DockerCli (docker.Client):
             for ids in self.cons_ids:
                 try:
                     if self.gflag:
+                        #For legacy reasons :), keeping below comments.
                         #self.brick_ext += 1
                         #self.brick_mount = '/rhs_bricks/brick'+str(self.brick_ext)
                         self.brick_source = self.brick_set[self.brick_ext]
                         self.brick_ext += 1
+
                     # TODO : look at other options
                     #mostly need to link these containers using link option
                     #http://blog.docker.io/2013/10/docker-0-6-5-links-container-naming-advanced-port-redirects-host-integration/
@@ -245,7 +243,7 @@ class DockerCli (docker.Client):
                 except Exception as e:
                     logger.critical("Exception raised when starting Container with id:%s", ids)
 
-                    logger.debug(e)
+                    logger.error(e)
                     return False
 
 
@@ -263,8 +261,6 @@ class DockerCli (docker.Client):
             for ids in self.cons_ids:
                 try:
                     insp_obj = self.dc.inspect_container(ids)
-                    #logger.debug(insp_obj['Config']['Hostname'])
-                    #logger.debug(insp_obj['NetworkSettings']['IPAddress'])
                     hostname =insp_obj['Config']['Hostname']
                     ipaddr = insp_obj['NetworkSettings']['IPAddress']
                     if not ipaddr :
@@ -307,7 +303,7 @@ class DockerCli (docker.Client):
         self.waitsecs = 15
         logger.debug("Timeout for build process has been set to :%s seconds", self.waitsecs)
         try:
-            logger.debug("Working on docker file :%s", self.dock_filepath)
+            logger.info("Working on docker file :%s .. Please wait..", self.dock_filepath)
             if self.dock_filepath:
                 logger.info("Build it with dockerfile:%s \t and Tag: %s and self.dc: %s .."
                              "need to wait .." , self.dock_filepath, self.dock_tag, self.dc)
@@ -332,12 +328,12 @@ class DockerCli (docker.Client):
                         for im in self.images:
                             for tag in im['RepoTags']:
                                 if self.dock_tag in str(tag):
-                                    logger.debug("dock_tag:%s  successfully built and available in repo", self.dock_tag)
+                                    logger.info("dock_tag:%s  successfully built and available in repo", self.dock_tag)
                                     #return True
                                     return im
 
                         self.waitsecs = self.waitsecs - 1
-                    logger.debug("Just before returning")
+
                     return False
 
                 else:
