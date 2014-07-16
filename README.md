@@ -20,6 +20,7 @@ You can use this (dockit)executable for:
 
 * Make sure "selinux" is turned off in the system where you run containers!!
 * Install python-setuptools package or make sure you have 'setuptools' module available in your python path.
+* If you are running in RHEL systems , please subscribe to EPEL channels as mentioned here (https://docs.docker.com/installation/rhel/)to make docker packages available.Also start docker process manually.
 * If you can install 'docker' packages in the system before running this binary, I will be happy :). Eventhough this binary
 can install docker packages, yum transactions performed by this binary is very sensitive on minor errors like repodata error..etc
 I am looking for alternatives.
