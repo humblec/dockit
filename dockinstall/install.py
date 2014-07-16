@@ -239,7 +239,7 @@ class Packageinst:
         try:
             if sysdict['dist'] == "fedora":
                 req_pcks = list(fedora_req_pcks)
-            elif sysdict['dist'] == "rhel":
+            elif sysdict['dist'] == "redhat":
                 req_pcks = list(rhel_req_pcks)
             elif sysdict['dist'] == "centos":
                 req_pcks = list(centos_req_pcks)
