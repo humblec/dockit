@@ -25,6 +25,7 @@ I am looking for alternatives.
 * Base/official image 'pulling' (ex: ubuntu official image) is disabled for this version.  How-ever if you have specified base image in docker file, it should work..
 * The image which you use for gluster deployment should have "ssh" deamon running in it with ssh password 'redhat'.
  An example image can be found @https://index.docker.io/u/humble/fed20-gluster/
+* If you are trying to install GlusterFs binary for a particular version (--gi) its better to use an image which has glusterfs build prerequisites installed & ssh deamon running with password 'redhat', such an image can be found here:https://registry.hub.docker.com/u/humble/f20-glusterfs-source/.
 * Finally read the "help" output to use this in its full strength.
 * When running this binary it may require 'image tag' at times, you can use default tag called 'latest' if you dont have any other choice.
 

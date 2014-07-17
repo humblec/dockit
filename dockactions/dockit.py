@@ -301,7 +301,7 @@ class DockerCli (docker.Client):
         #todo: Add support for github url
 
         self.waitsecs = 15
-        logger.debug("Timeout for build process has been set to :%s seconds", self.waitsecs)
+        logger.debug("Timeout for build process has been set to :%s minutes", self.waitsecs)
         try:
             logger.info("Working on docker file :%s .. Please wait..", self.dock_filepath)
             if self.dock_filepath:
