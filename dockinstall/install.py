@@ -314,9 +314,11 @@ class Procstart:
             logger.debug("%s :%s" % (k, w))
             self.proc = w
             if w == "docker":
-		#todo:  RHEL dont have systemctl, so may run it via docker -d command
-                self.cmd = 'systemctl start docker'
-                #self.cmd = 'docker -d'
+                if os.path.exists("/usr/bin/systemctl"):
+                    self.cmd = 'systemctl start docker'
+                else:
+                    self.cmd = 'docker -d'
+                    logger.debug(self.cmd)
             else:
                 logger.error("Unknown process %s ..exiting" % (w))
                 self.cmd = 'exit 1'
