@@ -19,13 +19,16 @@ You can use this (dockit)executable for:
 #### PREPARE YOUR SETUP:
 
 * Make sure "selinux" is turned off in the system where you run containers!!
+* Install python-setuptools package or make sure you have 'setuptools' module available in your python path.
+* If you are running in RHEL systems , please subscribe to EPEL channels as mentioned here (https://docs.docker.com/installation/rhel/)to make docker packages available.Also start docker process manually.
 * If you can install 'docker' packages in the system before running this binary, I will be happy :). Eventhough this binary
 can install docker packages, yum transactions performed by this binary is very sensitive on minor errors like repodata error..etc
 I am looking for alternatives.
 * Base/official image 'pulling' (ex: ubuntu official image) is disabled for this version.  How-ever if you have specified base image in docker file, it should work..
 * The image which you use for gluster deployment should have "ssh" deamon running in it with ssh password 'redhat'.
  An example image can be found @https://index.docker.io/u/humble/fed20-gluster/
-* If you are trying to install GlusterFs binary for a particular version (--gi) its better to use an image which has glusterfs build prerequisites installed & ssh deamon running with password 'redhat', such an image can be found here:https://registry.hub.docker.com/u/humble/f20-glusterfs-source/.
+* If you are trying to install GlusterFs binary for a particular version (--gi) its better to use an image which has glusterfs build prerequisites installed (  http://gluster.org/community/documentation/index.php/Building_GlusterFS )& ssh deamon running with password 'redhat', such an image can be found here:https://registry.hub.docker.com/u/humble/f20-glusterfs-source/, otherwise it can take long time.
+
 * Finally read the "help" output to use this in its full strength.
 * When running this binary it may require 'image tag' at times, you can use default tag called 'latest' if you dont have any other choice.
 
@@ -53,19 +56,22 @@ Step 5: Read dockit's help
 #dockit --help
 ```
 
-Step 6: If you are planning to use it for gluster deployment ( -g option flag of dockit) and for automatic volume creation , create a file in your filesystem with below entry/entries for giving brick configuration. 
+Step 6: If you are planning to use it for gluster deployment ( -g option flag ) and for automatic volume creation (--gv), there are 2 ways to give input:
+
+
+1) Give the configuration manually.
+2) Let dockit read the configuration from a configuration file (-c option)
+
+Either of above, you need a configuration file in your filesystem. The configuration file should have atleast  below entry.
 
 ```
 [root@ dockit]# cat /configfile 
 BRICKS="/brick6,/brick7,/brick8,/brick9"
-VOL_TYPE="2x2x1"
-VOLNAME="DemoVolume"
 [root@dockit]# 
 
 ```
+If you opt for option 1 :
 
-When invoking 'dockit' binary , If -g is enabled with --gv option , it will ask for below information, how-ever if you want to read these inputs
-from configuration file , it is also possible (... -g -c '/home/hchiramm/configfile') by giving config file as an input:
 ```
 Gluster Volume Type (ex: 2x2x1 where (distribute,replica, stripe count in order)     :2x2x1
 Gluster Volume Name (ex: glustervol)     :myvol
@@ -76,7 +82,17 @@ Gluster brick file (ex: /home/configfile)    :/configfile
 Where 'Volume Type' is the configuration of gluster configurtion wrt distribut-replica-stripe.. Volume name is self explanatory and 'Export Dir Name' will be the mount point inside the containers where brick is configured. The brick file is mentioned above.
 For ex: If you give options like '2x2x1' which means it create 4 containers and brick names will be fetched in order from above config file. Make sure you have equal number of entries in your config file against the number of gluster containers you wish to spawn..
 
+If you opt for option 2, you may define these variables in config file,otherwise it will take default values for Volume name, Export Dir, Volume type..etc
 
+```
+[root@ dockit]# cat /configfile 
+BRICKS="/brick6,/brick7,/brick8,/brick9"
+VOLNAME="testvol"
+VOL_TYPE="2x2x1"
+SERVER_EXPORT_DIR="/rhs_bricks"
+
+[root@dockit]# 
+```
 
 
 Step 7: Use it and Report bugs/comment/suggestions/RFEs @humble.devassy@gmail.com , if you come across any.
@@ -201,9 +217,6 @@ dockit      : INFO     Done!
 Example 2:
 
 Start 4 containers using image humble/fed20-gluster with tag 'latest' and run in gluster mode and auto start volume by reading configuration from file /home/hchiramm/config
-
-Where /home/hchiramm/config has below entries:
-
 
 
 ```

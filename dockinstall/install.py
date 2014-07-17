@@ -43,7 +43,7 @@ sysdict = {'dist': '', 'ver': '', 'name': ''}
 
 fedora_req_pcks = ["docker-io", "python-docker-py"]
 centos_req_pcks = ["docker-io", "python-docker-py"]
-rhel_req_pcks = ["docker", "python-docker-py"]
+rhel_req_pcks = ["docker-io", "python-docker-py"]
 req_pcks = []
 mis_pcks = []
 avail_pcks = []
@@ -239,7 +239,7 @@ class Packageinst:
         try:
             if sysdict['dist'] == "fedora":
                 req_pcks = list(fedora_req_pcks)
-            elif sysdict['dist'] == "rhel":
+            elif sysdict['dist'] == "redhat":
                 req_pcks = list(rhel_req_pcks)
             elif sysdict['dist'] == "centos":
                 req_pcks = list(centos_req_pcks)
@@ -314,6 +314,7 @@ class Procstart:
             logger.debug("%s :%s" % (k, w))
             self.proc = w
             if w == "docker":
+		#todo:  RHEL dont have systemctl, so may run it via docker -d command
                 self.cmd = 'systemctl start docker'
                 #self.cmd = 'docker -d'
             else:
