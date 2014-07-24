@@ -266,11 +266,11 @@ class Packageinst:
                         try:
                             if pck == "python-docker-py":
                                 logger.debug("Trying with pip")
-                                cmd = "sudo pip install {0} -U".format("docker-py")
+                                cmd = "sudo pip install {0} -U >/dev/null".format("docker-py")
                                 os.system(cmd)
                                 mis_pcks.remove(pck)
                             else:
-                                logger.error("Unknown package for me to install via pip")
+                                logger.info("Unknown package for me to install via pip.. Proceeding")
                         except Exception as e:
                             logger.error(e)
                             logger.error("Error occurred when trying to install %s  using pip -> Try to install manually" % (pck))
@@ -299,8 +299,14 @@ class Packageinst:
                         return True
                     except Exception as e:
                         logger.error(
-                            "Exiting due to transaction failure:%s", e)
-                        sys.exit(1)
+                            "Yum transaction failure:%s .. Giving one more try", e)
+                        for pkgs in mis_pcks:
+                            os_cmd = "yum install -y %s >/dev/null" %(pkgs)
+                            if os.system(os_cmd):
+                                print "Failed again to install %s package" % (pkgs)
+                                sys.exit(1)
+
+
         except Exception as e:
             logger.critical("Exiting..%s", e)
 
