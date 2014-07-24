@@ -14,13 +14,14 @@ You can use this (dockit)executable for:
 * This binary can be used to pull docker images.
 * This binary can build containers based on dockerfile.
 * This binary can start containers based on provided image.
-* This binary can be used to deploy gluster trusted pool on containers. 
+* This binary can be used to install any number of containers running with specified version of glusterfs binary
+  and also to deploy gluster trusted pool on containers.
 
 #### PREPARE YOUR SETUP:
 
 * Make sure "selinux" is turned off in the system where you run containers!!
 * Install python-setuptools package or make sure you have 'setuptools' module available in your python path.
-* If you are running in RHEL6 systems , please subscribe to EPEL channels as mentioned here (https://docs.docker.com/installation/rhel/)to make docker packages available.Also start docker process manually.
+* If you are running in RHEL6 systems , please subscribe to EPEL channels as mentioned here (https://docs.docker.com/installation/rhel/)to make docker packages available.
 * Base/official image 'pulling' (ex: ubuntu official image) is disabled for this version.  How-ever if you have specified base image in docker file, it should work..
 * The image which you use for gluster deployment should have "ssh" deamon running in it with ssh password 'redhat'.
  An example image can be found @https://index.docker.io/u/humble/fed20-gluster/
@@ -45,15 +46,13 @@ Step 2: Install 'dockit'
 
 Step 3: Verify there exist a binary called 'dockit`
 
-Step 4: If possible , install docker-io package in your distro(ex: fedora/centos/rhel)
-
-Step 5: Read dockit's help
+Step 4: Read dockit's help
 
 ```
 #dockit --help
 ```
 
-Step 6: If you are planning to use it for gluster deployment ( -g option flag ) and for automatic volume creation (--gv), there are 2 ways to give input:
+Step 5: If you are planning to use it for gluster deployment ( -g option flag ) and for automatic volume creation (--gv), there are 2 ways to give input:
 
 
 1) Give the configuration manually.
