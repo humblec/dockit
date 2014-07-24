@@ -44,6 +44,7 @@ sysdict = {'dist': '', 'ver': '', 'name': ''}
 fedora_req_pcks = ["docker-io", "python-docker-py"]
 centos_req_pcks = ["docker-io", "python-docker-py"]
 rhel_req_pcks = ["docker-io", "python-docker-py"]
+rhel7_req_pcks = ["docker",  "python-docker-py"]
 req_pcks = []
 mis_pcks = []
 avail_pcks = []
@@ -240,7 +241,11 @@ class Packageinst:
             if sysdict['dist'] == "fedora":
                 req_pcks = list(fedora_req_pcks)
             elif sysdict['dist'] == "redhat":
-                req_pcks = list(rhel_req_pcks)
+
+                if sysdict['ver'] < '7':
+                    req_pcks = list(rhel_req_pcks)
+                else:
+                    req_pcks = list(rhel7_req_pcks)
             elif sysdict['dist'] == "centos":
                 req_pcks = list(centos_req_pcks)
             else:
