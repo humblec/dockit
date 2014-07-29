@@ -96,9 +96,7 @@ Step 7: Use it and Report bugs/comment/suggestions/RFEs @humble.devassy@gmail.co
 
 #### TODO:
 
-* Remove pre-defined ssh password dependency on the image.
-[list to be filled later]
-
+Refer# https://github.com/humblec/dockit/wiki/TODO
 
 Lets run this executable:
 
