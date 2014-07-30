@@ -19,7 +19,6 @@ You can use this (dockit)executable for:
 
 #### PREPARE YOUR SETUP:
 
-* Make sure "selinux" is turned off in the system where you run containers!!
 * Install python-setuptools package or make sure you have 'setuptools' module available in your python path.
 * If you are running in RHEL6 systems , please subscribe to EPEL channels as mentioned here (https://docs.docker.com/installation/rhel/)to make docker packages available.
 * Base/official image 'pulling' (ex: ubuntu official image) is disabled for this version.  How-ever if you have specified base image in docker file, it should work..
