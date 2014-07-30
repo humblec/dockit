@@ -446,7 +446,7 @@ def create_logger():
 
 def main(dryr=0, dockit_log=dockit_log_file):
 
-    print print_menu()
+    #print print_menu()
    # create_logger()
 
     parser = OptionParser()
@@ -513,7 +513,7 @@ def main(dryr=0, dockit_log=dockit_log_file):
     check = [o for o in anyopt if o]
     if not check:
         logging.error( "You missed one of the must required option..  reread and execute.... exiting .")
-        #print_menu()
+        print_menu()
         sys.exit(1)
     if options.gluinst or options.gluvolume:
         if not options.glumode:
