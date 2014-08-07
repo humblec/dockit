@@ -41,15 +41,10 @@ from dockglobals import logger
 dockit_log_file = "/var/log/dockit/dockit.log"
 sysdict = {'dist': '', 'ver': '', 'name': ''}
 
-fedora_req_pcks = ["docker-io", "python-docker-py"]
-centos_req_pcks = ["docker-io", "python-docker-py"]
-rhel_req_pcks = ["docker-io", "python-docker-py"]
+fedora_req_pcks = centos_req_pcks = rhel_req_pcks = ["docker-io", "python-docker-py"]
 rhel7_req_pcks = ["docker",  "python-docker-py"]
-req_pcks = []
-mis_pcks = []
-avail_pcks = []
-gluster_config={}
-globalopts={}
+req_pcks = mis_pcks = avail_pcks = []
+gluster_config= globalopts={}
 
 
 def talktoDocker(pulloption, baseimage, imagetag, numcontainers, dockerfile, dockerrepo, buildoption, startoption, gluster_mode, gluster_install, gluster_volume):
