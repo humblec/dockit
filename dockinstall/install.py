@@ -20,7 +20,7 @@
 
 
 import sys
-import yum
+
 import os
 from optparse import OptionParser
 import logging
@@ -42,6 +42,7 @@ dockit_log_file = "/var/log/dockit/dockit.log"
 sysdict = {'dist': '', 'ver': '', 'name': ''}
 
 fedora_req_pcks = centos_req_pcks = rhel_req_pcks = ["docker-io", "python-docker-py"]
+ubuntu_req_pcks = ["docker.io", "python-docker-py"]
 rhel7_req_pcks = ["docker",  "python-docker-py"]
 req_pcks = mis_pcks = avail_pcks = []
 gluster_config= globalopts={}
@@ -232,75 +233,125 @@ class Packageinst:
 			which need to be installed and if its not available
 			it will be installed
 		"""
+
+        rhelflag = 0
         try:
             if sysdict['dist'] == "fedora":
                 req_pcks = list(fedora_req_pcks)
+                rhelflag = 1
             elif sysdict['dist'] == "redhat":
 
                 if sysdict['ver'] < '7':
                     req_pcks = list(rhel_req_pcks)
                 else:
                     req_pcks = list(rhel7_req_pcks)
+                rhelflag = 1
             elif sysdict['dist'] == "centos":
                 req_pcks = list(centos_req_pcks)
+                rhelflag = 1
+            elif sysdict['dist'] == "Ubuntu":
+                req_pcks = list(ubuntu_req_pcks)
             else:
                 logger.error("Unknown Distribution for me")
                 sys.exit(1)
 
             logger.info("Distribution:%s Required %s packages \n\t \t \t Making yum transactions", sysdict['dist'], req_pcks)
-            yb = yum.YumBase()
-            yb.conf.cache = os.geteuid() != 1
-            for pck in req_pcks:
-                if yb.rpmdb.searchNevra(name=pck):
-                    logger.info("%s -> Installed" % (pck))
-                    avail_pcks.append(pck)
-                else:
-                    logger.info("%s -> not installed" % (pck))
-                    mis_pcks.append(pck)
-                    if not self.skipflag:
-                        try:
-                            if pck == "python-docker-py":
-                                logger.debug("Trying with pip")
-                                cmd = "sudo pip install {0} -U >/dev/null".format("docker-py")
-                                os.system(cmd)
-                                mis_pcks.remove(pck)
-                            else:
-                                logger.info("Unknown package for me to install via pip.. Proceeding")
-                        except Exception as e:
-                            logger.error(e)
-                            logger.error("Error occurred when trying to install %s  using pip -> Try to install manually" % (pck))
-                            sys.exit(1)
-                        try:
-                            yb.install(name=pck)
-                            time.sleep(5)
-                        except yum.Errors.InstallError, err:
-                            logger.error("exiting : Error when installing package %s", pck)
-                            logger.error("%s", (str(err)))
-                            sys.exit(1)
-                        except Exception as e:
-                            logger.critical(e)
-                            logger.error("Error occurred when trying to install %s -> Try to install manually" % (pck))
-                            sys.exit(1)
-            if len(mis_pcks) > 0:
-                if self.skipflag:
-                    logger.info("Please install the %s packages and try again.", mis_pcks)
-
-                    sys.exit(1)
-                else:
-                    try:
-                        yb.resolveDeps()
-                        yb.buildTransaction()
-                        yb.processTransaction()
-                        return True
-                    except Exception as e:
-                        logger.error(
-                            "Yum transaction failure:%s .. Giving one more try", e)
-                        for pkgs in mis_pcks:
-                            os_cmd = "yum install -y %s >/dev/null" %(pkgs)
-                            if os.system(os_cmd):
-                                print "Failed again to install %s package" % (pkgs)
+            if rhelflag == 1:
+		try:
+		    import yum
+		except Exception as e:
+			print "Error when importing yum module"
+			sys.exit(1)
+                yb = yum.YumBase()
+                yb.conf.cache = os.geteuid() != 1
+                for pck in req_pcks:
+                    if yb.rpmdb.searchNevra(name=pck):
+                        logger.info("%s -> Installed" % (pck))
+                        avail_pcks.append(pck)
+                    else:
+                        logger.info("%s -> not installed" % (pck))
+                        mis_pcks.append(pck)
+                        if not self.skipflag:
+                            try:
+                                if pck == "python-docker-py":
+                                    logger.debug("Trying with pip")
+                                    cmd = "sudo pip install {0} -U >/dev/null".format("docker-py")
+                                    os.system(cmd)
+                                    mis_pcks.remove(pck)
+                                else:
+                                    logger.info("Unknown package for me to install via pip.. Proceeding")
+                            except Exception as e:
+                                logger.error(e)
+                                logger.error("Error occurred when trying to install %s  using pip -> Try to install manually" % (pck))
                                 sys.exit(1)
+                            try:
+                                yb.install(name=pck)
+                                time.sleep(5)
+                            except yum.Errors.InstallError, err:
+                                logger.error("exiting : Error when installing package %s", pck)
+                                logger.error("%s", (str(err)))
+                                sys.exit(1)
+                            except Exception as e:
+                                logger.critical(e)
+                                logger.error("Error occurred when trying to install %s -> Try to install manually" % (pck))
+                                sys.exit(1)
+                if len(mis_pcks) > 0:
+                    if self.skipflag:
+                        logger.info("Please install the %s packages and try again.", mis_pcks)
 
+                        sys.exit(1)
+                    else:
+                        try:
+                            yb.resolveDeps()
+                            yb.buildTransaction()
+                            yb.processTransaction()
+                            return True
+                        except Exception as e:
+                            logger.error(
+                                "Yum transaction failure:%s .. \n Giving one more try", e)
+                            for pkgs in mis_pcks:
+                                os_cmd = "yum install -y %s >/dev/null" %(pkgs)
+                                if os.system(os_cmd):
+                                    print "Failed again to install %s package" % (pkgs)
+                                    sys.exit(1)
+            else:
+                for pck in req_pcks:
+                    u_pkg_check = "dpkg-query -l %s >/dev/null" %(pck)
+                    if (os.system(u_pkg_check)) == 0:
+                        logger.info("%s -> Installed" % (pck))
+                        avail_pcks.append(pck)
+                    else:
+                        logger.info("%s -> not installed" % (pck))
+                        mis_pcks.append(pck)
+                        if not self.skipflag:
+                            try:
+                                if pck == "python-docker-py":
+                                    logger.debug("Trying with pip")
+                                    cmd = "sudo pip install {0} -U >/dev/null".format("docker-py")
+                                    os.system(cmd)
+                                    mis_pcks.remove(pck)
+                                else:
+                                    logger.info("Unknown package for me to install via pip.. Proceeding")
+                            except Exception as e:
+                                logger.error(e)
+                                logger.error("Error occurred when trying to install %s  using pip -> Try to install manually" % (pck))
+                                sys.exit(1)
+                if len(mis_pcks) > 0:
+                    if self.skipflag:
+                        logger.info("Please install the %s packages and try again.", mis_pcks)
+
+                        sys.exit(1)
+                    else:
+                        try:
+
+                            for pkgs in mis_pcks:
+                                os_cmd = "sudo apt-get install -y %s && sudo ln -sf /usr/bin/docker.io /usr/local/bin/docker >/dev/null" %(pkgs)
+                                if os.system(os_cmd):
+                                    print "Failed again to install %s package" % (pkgs)
+                                    sys.exit(1)
+                        except:
+                            logger.exception("Exception occurred when trying to install packages in Ubuntu system..exiting")
+                            sys.exit(1)
 
         except Exception as e:
             logger.critical("Exiting..%s", e)
@@ -331,8 +382,11 @@ class Procstart:
 
 
     def checkproc(self):
-
-        self.proc='docker -d'
+	dist, ver, name = platform.dist()
+	if dist == "Ubuntu":
+        	self.proc='docker.io -d'
+	else:
+		self.proc='docker -d'
         try:
             s = subprocess.Popen(["ps", "aux"], stdout=subprocess.PIPE)
             for prs in s.stdout:
