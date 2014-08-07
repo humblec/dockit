@@ -410,39 +410,10 @@ def read_config_file(conf_file):
 
     return gluster_config
 
-def create_logger():
-    # create logger with 'dockit'
-
-
-    stdout_log = stderr_log = dockit_log_file
-    if not os.path.isdir("/var/log/dockit"):
-        os.mkdir('/var/log/dockit/')
-    dockit_out = open(dockit_log_file, 'a+',0)
-
-
-    #logging.basicConfig(level=logging.INFO)
-   # logger = logging.getLogger('dockit')
-    logger.setLevel(logging.DEBUG)
-    # create file handler which logs even debug messages
-    fh = logging.FileHandler(dockit_log_file)
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    fh.setFormatter(formatter)
-
-    fh.setLevel(logging.DEBUG)
-    # create console handler with a higher log level
-    ch = logging.StreamHandler()
-    ch.setFormatter(formatter)
-    ch.setLevel(logging.ERROR)
-    logger.addHandler(fh)
-    logger.addHandler(ch)
-
 
 
 
 def main(dryr=0, dockit_log=dockit_log_file):
-
-    #print print_menu()
-   # create_logger()
 
     parser = OptionParser()
     parser.add_option("-d", "--dry_run",
