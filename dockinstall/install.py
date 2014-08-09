@@ -31,6 +31,7 @@ import pty
 import time
 import docker
 import pip
+import getpass
 import json
 from dockactions import dockit
 from dockutils import run_helper
@@ -106,6 +107,7 @@ def talktoDocker(pulloption, baseimage, imagetag, numcontainers, dockerfile, doc
 
         if startoption:
 
+
             if flag or flag1:
                 logger.debug("Flag:%s \t Flag1:%s image tag:\t %s" ,flag, flag1,new_image_tag)
 
@@ -146,11 +148,13 @@ def talktoDocker(pulloption, baseimage, imagetag, numcontainers, dockerfile, doc
                     #loginC(connret.container_ips, connret.cons_ids)
                	    if gluster_mode:
                         gluster_cli = create_vol.glusteractions()
+
                         if gluster_cli:
                             logger.debug("Successfully created gluster client")
                             run_helper.rh_config_dict['SERVER_IP_ADDRS'] =connret.container_ips
                         else:
                             logger.error("Failed to create gluster client")
+                        run_helper.con_pass = getpass.getpass()
                         if gluster_install:
                             ginst =  gluster_config.get('GLUSTER_VERSION','3.5')
                             if ginst:

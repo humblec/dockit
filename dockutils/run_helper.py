@@ -20,6 +20,7 @@
 import sys, os
 import re
 import paramiko
+
 import getopt
 import threading
 from dockglobals import logger
@@ -27,7 +28,7 @@ import logging
 
 
 rh_config_dict={}
-
+con_pass=''
 
 def read_config_file():
     global rh_config_dict
@@ -66,6 +67,7 @@ def get_nodes_ip():
     for server in servers:
 
         server_set.add(server)
+
 
     return list(server_set)
 
@@ -179,11 +181,14 @@ def run_command(node, cmd, verbose):
         #pmk = logging.getLogger("paramiko")
         #pmk.setLevel(logging.WARNING)
         #logger.addHandler(pmk)
+
         logging.getLogger("paramiko").setLevel(logging.WARNING)
         ssh_handle = paramiko.SSHClient()
         ssh_handle.load_system_host_keys()
         ssh_handle.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_handle.connect(node, username='root', password='redhat')
+        #todo : may need to look at user name as well
+        ssh_handle.connect(node, username='root', password=con_pass)
+
         chan = ssh_handle.get_transport().open_session()
 
 
@@ -277,6 +282,7 @@ def main():
         for client_ip in client_ips:
             if client_ip not in nodes:
                 nodes.append(client_ip)
+
 
     if remoterun == True:
         for node in nodes:
