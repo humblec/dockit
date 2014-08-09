@@ -477,3 +477,15 @@ CONTAINER ID        IMAGE                 COMMAND                CREATED        
 
 
 ```
+
+#Changelog:
+Version 2.0:
+
+* Support added for Ubuntu Host system.
+* ssh password dependency avoided for the docker image. Its been prompted now from the user.
+
+Version 1.5:
+
+* Dockit operate on gluster and general mode
+* Gluster installation and configuration added with --gi and --gv version
+*
