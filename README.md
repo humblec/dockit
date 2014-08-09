@@ -22,8 +22,7 @@ You can use this (dockit)executable for:
 * Install python-setuptools package or make sure you have 'setuptools' module available in your python path.
 * If you are running in RHEL6 systems , please subscribe to EPEL channels as mentioned here (https://docs.docker.com/installation/rhel/)to make docker packages available.
 * Base/official image 'pulling' (ex: ubuntu official image) is disabled for this version.  How-ever if you have specified base image in docker file, it should work..
-* The image which you use for gluster deployment should have "ssh" deamon running in it with ssh password 'redhat'.
- An example image can be found @https://index.docker.io/u/humble/fed20-gluster/
+* The image which you use for gluster deployment should have "ssh" deamon running in it. The password will be prompted from the user if invoked in gluster mode. An example image can be found @https://index.docker.io/u/humble/fed20-gluster/
 * If you are trying to install GlusterFs binary for a particular version (--gi) its better to use an image which has glusterfs build prerequisites installed (  http://gluster.org/community/documentation/index.php/Building_GlusterFS )& ssh deamon running with password 'redhat', such an image can be found here:https://registry.hub.docker.com/u/humble/f20-glusterfs-source/, otherwise it can take long time.
 
 * Finally read the "help" output to use this in its full strength.
@@ -477,3 +476,15 @@ CONTAINER ID        IMAGE                 COMMAND                CREATED        
 
 
 ```
+
+#Changelog:
+Version 2.0:
+
+* Support added for Ubuntu Host system.
+* ssh password dependency avoided for the docker image. Its been prompted now from the user.
+
+Version 1.5:
+
+* Dockit operate on gluster and general mode
+* Gluster installation and configuration added with --gi and --gv version
+*
