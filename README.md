@@ -28,6 +28,7 @@ You can use this (dockit)executable for:
 * Finally read the "help" output to use this in its full strength.
 * When running this binary it may require 'image tag' at times, you can use default tag called 'latest' if you dont have any other choice.
 
+* If you come across any issues when running the dockit binary with options, please refer "Troubleshooting_guide.md". You may have solution there itself.
 
 #### How to start
 
@@ -94,7 +95,18 @@ Step 7: Use it and Report bugs/comment/suggestions/RFEs @humble.devassy@gmail.co
 
 #### TODO:
 
-Refer# https://github.com/humblec/dockit/wiki/TODO
+
+
+
+*    Currently dockit is supporting fedora, centos, rhel as base system or host OS, expand dockit to support ubuntu and other OSs. -- UPDATE: Support for ubuntu added from version 2.0
+
+*    If we want to install gluster on spawned containers, ssh deamon should be running in those images with password "redhat" , The password dependency has to be nullified and it has to be fetched from a config file. - UPDATE : The password dependency is removed from Version 2.0 : Its now prompted from user when operating on gluster mode.
+
+*    Make dockit accept "containers" ( ID/HOSTNAME/IP) (I prefer containers IDs as an input to binary) and start working on gluster mode.
+
+*    Also try to accept multi nodes as command input and configure a cluster/trusted pool based on multi nodes.
+
+For more details refer# https://github.com/humblec/dockit/wiki/TODO
 
 Lets run this executable:
 

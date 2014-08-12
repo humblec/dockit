@@ -25,12 +25,13 @@ dockit : ERROR Image + tag does not exist.. I cant start container from this..ex
 
 This comes when there is no image exist in your local/remote docker repo on given name:
 
-For ex: if you have specified '-i humble/fed20-gluster ' in your command you have to make sure the image exist in the same name in your image repo.
+For ex: if you have specified '-i humble/fed20-gluster ' in your command, you have to make sure the image exist, in the same name in your image repo.
 
 You can check existing images of your docker repo by :
 
-#docker images 
-
+```
+docker images 
+```
 ## Possibility 4:
 
 ```
