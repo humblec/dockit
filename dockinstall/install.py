@@ -42,9 +42,10 @@ from dockglobals import logger
 dockit_log_file = "/var/log/dockit/dockit.log"
 sysdict = {'dist': '', 'ver': '', 'name': ''}
 
-fedora_req_pcks = centos_req_pcks = rhel_req_pcks = ["docker-io", "python-docker-py"]
+fedora_req_pcks = centos_req_pcks = rhel_req_pcks = centos_req_pcks = ["docker-io", "python-docker-py"]
 ubuntu_req_pcks = ["docker.io", "python-docker-py"]
 rhel7_req_pcks = ["docker",  "python-docker-py"]
+centos7_req_pcks = ["docker"]
 req_pcks = mis_pcks = avail_pcks = []
 gluster_config= globalopts={}
 
@@ -244,14 +245,16 @@ class Packageinst:
                 req_pcks = list(fedora_req_pcks)
                 rhelflag = 1
             elif sysdict['dist'] == "redhat":
-
                 if sysdict['ver'] < '7':
                     req_pcks = list(rhel_req_pcks)
                 else:
                     req_pcks = list(rhel7_req_pcks)
                 rhelflag = 1
             elif sysdict['dist'] == "centos":
-                req_pcks = list(centos_req_pcks)
+                if sysdict['ver'] < '7':
+                    req_pcks = list(centos_req_pcks)
+                else:
+                    req_pcks = list(centos7_req_pcks)
                 rhelflag = 1
             elif sysdict['dist'] == "Ubuntu":
                 req_pcks = list(ubuntu_req_pcks)
