@@ -198,7 +198,7 @@ class DockerCli (docker.Client):
                                                     entrypoint=None, cpu_shares=None, working_dir=None)
 
                 else:
-                    #self.dock_command ='/bin/bash'
+                    self.dock_command ='/bin/bash'
                     self.container_id = self.dc.create_container(
                                                     self.c_tag, command=self.dock_command, hostname=None, user=None,
                                                     detach=True, stdin_open=True, tty=True, mem_limit=0,
