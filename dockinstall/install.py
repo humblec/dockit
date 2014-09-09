@@ -314,7 +314,7 @@ class Packageinst:
                             yb.processTransaction()
                             return True
                         except Exception as e:
-                            logger.error(
+                            logger.warn(
                                 "Yum transaction failure:%s .. \n Giving one more try", e)
                             for pkgs in mis_pcks:
                                 os_cmd = "yum install -y %s >/dev/null" %(pkgs)
@@ -668,7 +668,7 @@ def main(dryr=0, dockit_log=dockit_log_file):
             ret = sysobj.checkprereq()
 
             if ret:
-                logger.info("Pre-requisites are installed")
+                logger.info("Success:Pre-requisites are installed")
             else:
                 logger.debug("Either install it or let me install ")
                 sys.exit(1)
