@@ -184,7 +184,53 @@ Options:
 
 If we run the binary with options:
 
-Example 1: Pull an image (fed20-gluster) from docker repo (humble) and start 3 containers from it.
+Example 1: Start an already existing fedora image (tag : latest) with command "/bin/bash" and run one instance.
+
+```
+[root@humbles-lap dockit]#  dockit -s -i fedora -t latest  -n 1  /bin/bash
+
+dockit      : INFO     Dockit starting.. Process logs are available at:/var/log/dockit/dockit.log
+Do you want to continue (y/n)y
+dockit      : INFO     Proceeding 
+dockit      : INFO     Run containers natively, no mode configured
+dockit      : INFO     Distribution:fedora
+dockit      : INFO     Distribution:fedora Required ['docker-io', 'python-docker-py'] packages 
+	 	 	 Making yum transactions
+Loaded plugins: langpacks, refresh-packagekit
+dockit      : INFO     docker-io -> Installed
+dockit      : INFO     python-docker-py -> Installed
+
+dockit      : INFO     Pre-requisites are installed
+dockit      : INFO     Requested process: docker -d is running
+dockit      : INFO     Successfully connected to docker deamon: 
+	 	 	 pull/build/start containers accordingly.
+dockit      : INFO     Not trying to pull image:fedora.. continuing
+dockit      : INFO     Going to run the containers
+dockit      : INFO      Create and start containers with image :fedora:latest 
+root        : INFO     Enable Gluster Volume :0
+
+dockit      : INFO       Information about running containers 
+dockit      : INFO     Containers are running successfully.. please login and work!!!!
+------------------------------------------------------------
+dockit      : INFO     Details about running containers..
+
+dockit      : INFO     Container IPs 	 : [u'172.17.0.2']
+ 
+dockit      : INFO     Container Ids 	 : [u'f7d7d7191218049c1970d709f6c40b0282d1cd086313856927876e7dd9ffd277'] 
+ 
+------------------------------------------------------------
+dockit      : INFO     Done!
+
+
+Check if the container is running :
+
+[root@humbles-lap dockit]# docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS                                          NAMES
+f7d7d7191218        fedora:latest       "/bin/bash"         16 seconds ago      Up 15 seconds       0.0.0.0:49153->22/tcp, 0.0.0.0:49154->80/tcp   lonely_mestorf
+
+```
+
+Example 2: Pull an image (fed20-gluster) from docker repo (humble) and start 3 containers from it.
 
 ```
 [root@humbles-lap dockit]#  dockit -p -i fed20-gluster -r humble -s -n 3
@@ -236,7 +282,7 @@ dockit      : INFO     Done!
 ```
 
 
-Example 2:
+Example 3:
 
 Start 4 containers using image humble/fed20-gluster with tag 'latest' and run in gluster mode and auto start volume by reading configuration from file /home/hchiramm/config
 
@@ -373,7 +419,7 @@ total 0
 ```
 
 
-Example 3: Install 3.4 gluster binary on 2 containers started using humble/fed20-gluster images.
+Example 4: Install 3.4 gluster binary on 2 containers started using humble/fed20-gluster images.
 
 ```
 [root@humbles-lap dockit]# dockit -i humble/fed20-gluster -t latest -s -n 2 -g -c /home/hchiramm/config --gi 3.4
