@@ -41,3 +41,5 @@ nosetests.xml
 htmlcov
 # record of files installed via setup.py
 files.txt
+# Vagrant file
+.vagrant
