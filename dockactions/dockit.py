@@ -150,8 +150,6 @@ class DockerCli (docker.Client):
         self.c_tag = image_tag
         self.container_id = ""
         self.info_array = ["Hostname", "NetworkSettings"]
-        #todo: For now, dont enable dock_command .
-        #self.dock_command=''
         self.brick_ext = 0
         self.gflag=gl_flag
         self.brick_set=[]
@@ -167,18 +165,8 @@ class DockerCli (docker.Client):
 
         logging.info( "Enable Gluster Volume :%s" ,self.gflag)
         try:
-            #docker run -i -t ubuntu /bin/bash
 
             for num in range(0,self.dock_numc):
-                #todo: If we just want to enable auto dir creation inside same directory
-
-
-                # self_note : when tty=False, the containers were just exited
-                # as soon as it is created or executed the provided command
-                # when its  True ,containers are  up and running , u can attach.
-                # also stdin_open to True, for docker attach comand
-                # ctrl+P+Q can detach the container
-                # detach=False means it wont exit the shell ?
 
                 if self.gflag:
                     self.brick_mount=gluster_dict['SERVER_EXPORT_DIR']
@@ -215,20 +203,8 @@ class DockerCli (docker.Client):
             for ids in self.cons_ids:
                 try:
                     if self.gflag:
-                        #For legacy reasons :), keeping below comments.
-                        #self.brick_ext += 1
-                        #self.brick_mount = '/rhs_bricks/brick'+str(self.brick_ext)
                         self.brick_source = self.brick_set[self.brick_ext]
                         self.brick_ext += 1
-
-                    # TODO : look at other options
-                    #mostly need to link these containers using link option
-                    #http://blog.docker.io/2013/10/docker-0-6-5-links-container-naming-advanced-port-redirects-host-integration/
-                    #regarding lxc_conf you can give me in dict formats
-                    #also it helps when changing to static ips .etc
-                    #-n flag looks similar:
-                    #https://github.com/dotcloud/docker-py/issues/79
-
                         ret = self.dc.start(
                                             ids, binds={self.brick_source:self.brick_mount}, port_bindings={22: None, 80: None},
                                             lxc_conf=None,publish_all_ports=False, links=None, privileged=True)
@@ -239,7 +215,6 @@ class DockerCli (docker.Client):
                     logger.debug("Container with ID :%s is started", ids)
                     time.sleep(10)
 
-		  	   # TODO: may be I need to commit these containers later with a different workflow.
                 except Exception as e:
                     logger.critical("Exception raised when starting Container with id:%s", ids)
 
@@ -247,9 +222,6 @@ class DockerCli (docker.Client):
                     return False
 
 
-            #TODO: This may not be the right place to put list containers
-            #and capturing the requested information
-            #logger.debug "Going to list the containers"
             #cons =  self.dc.containers(quiet=False, all=False, trunc=True, latest=False, since=None,
             #                   before=None, limit=-1)
             #for c in cons:

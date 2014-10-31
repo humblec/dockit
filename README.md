@@ -554,6 +554,10 @@ CONTAINER ID        IMAGE                 COMMAND                CREATED        
 ```
 
 #Changelog:
+
+Version 2.5:
+* Making dockit a pep8 and flake8 compliant project.
+
 Version 2.0:
 
 * Support added for Ubuntu Host system.

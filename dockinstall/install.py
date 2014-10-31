@@ -89,7 +89,6 @@ def talktoDocker(
                 logger.debug("new_image_tag:%s", new_image_tag)
             else:
                 logger.error("Error when pulling ")
-                # sys.exit(1)
         else:
             logger.info("Not trying to pull image:%s.. continuing", baseimage)
         if buildoption:
@@ -255,7 +254,6 @@ class Packageinst:
         else:
             sysdict['dist'] = dist
             sysdict['ver'] = int(ver)
-            # TODO: Check encoding for name. test getting dist for Fedora 19
             sysdict['name'] = name
             logger.info("Distribution:%s", sysdict['dist'])
             return True

@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
 # Copyright (C) 2014 Red Hat Inc.
-# Author      :M S Vishwanath Bhat < msvbhat@gmail.com >
-# Contributors:
+
+# Authors:
+# M S Vishwanath Bhat < msvbhat@gmail.com >
 # Humble Chirammal <humble.devassy@gmail.com> | <hchiramm@redhat.com>
 # Navid Shaikh <shaikhnavid14@gmail.com> | <nshaikh@redhat.com>
 #
@@ -94,7 +95,6 @@ class glusteractions():
             logger.info("Configuring/installing on node:%s", node)
             status1 = run_helper.run_command(
                 node, gluster_package_command, True)
-            # time.sleep(20)
 
             if status1:
                 logger.error('Required Gluster package installation '

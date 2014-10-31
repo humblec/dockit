@@ -2,7 +2,7 @@ import docker
 import sys
 
 # part of https://github.com/humblec/dockit.git
-# make sure docker moduel is availble , if not do
+# make sure docker module is availble , if not do
 # pip install docker-py
 
 DOCK_SOCK = "unix://var/run/docker.sock"

@@ -1,5 +1,6 @@
+# This is an example config file , keeping it here for legacy reasons.
+#
 #specify the IP addresses or hostnames of the server_ip nodes below separated by ',' as shown below.
-#SERVER_IP_ADDRS="rhsauto023.lab.eng.blr.redhat.com,rhsauto029.lab.eng.blr.redhat.com,rhsauto030.lab.eng.blr.redhat.com,rhsauto032.lab.eng.blr.redhat.com,rhsauto065.lab.eng.blr.redhat.com"
 
 SERVER_IP_ADDRS="172.17.0.6,172.17.0.7"
 
@@ -18,7 +19,7 @@ SERVER_EXPORT_DIR="/rhs_bricks"
 TRANS_TYPE="tcp"
 
 #specify the mountpoint
-MOUNTPOINT="/mnt/"
+#MOUNTPOINT="/mnt/"
 
 #specify the mount point i.e client protocol here. valid values are 'nfs' and 'fuse' and 'rdma'. Specify 'rdma' only in case of tcp,rdma transport type.
 #Else it wil lbe rejected

@@ -24,9 +24,7 @@ def create_logger():
     formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
     ch.setFormatter(formatter)
     logging.getLogger('').addHandler(ch)
-
     #logger.addHandler(ch)
-
     #logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger('dockit')
     logger.setLevel(logging.DEBUG)
@@ -39,8 +37,6 @@ def create_logger():
     logger.addHandler(fh)
 
     # create console handler with a higher log level
-
-
     return logger
 
 logger= create_logger()
