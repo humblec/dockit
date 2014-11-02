@@ -122,7 +122,7 @@ Step 7: Use it and Report bugs/comment/suggestions/RFEs @humble.devassy@gmail.co
 
 *    Make dockit accept "containers" ( ID/HOSTNAME/IP) (I prefer containers IDs as an input to binary) and start working on gluster mode.
 
-*    Also try to accept multi nodes as command input and configure a cluster/trusted pool based on multi nodes.
+*    Also try to accept multi nodes as command input and configure a cluster/trusted pool based on multi nodes. - UPDATE kubernates and other solutions are getting evaluated to achieve this functionality. 
 
 For more details refer# https://github.com/humblec/dockit/wiki/TODO
 

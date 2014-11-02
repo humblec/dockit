@@ -8,7 +8,7 @@ distutils.core.setup(
     license='LICENSE',
     author='hchiramm',
     author_email='hchiramm@redhat.com; humble.devassy@gmail.com',
-    install_requires = ['docker-py','paramiko','pip'],
+    install_requires = ['docker-py','paramiko','pip', 'python-devel'],
     entry_points={
         'console_scripts': [
             'dockit = dockinstall.install:main'
