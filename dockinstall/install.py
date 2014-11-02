@@ -709,14 +709,11 @@ def main(dryr=0, dockit_log=dockit_log_file):
     parser = OptionParser()
     parser = add_options(parser)
 
-    logger.info(
-        "Dockit starting.. Process logs are available at:%s", dockit_log_file)
 
     options, arguments = parser.parse_args()
     globalopts = dict(options.__dict__)
 
     pull_option_args = ['image', 'dockerrepo']
-    # pull_option_args = ['image']
     build_option_args = ['dockerfile', 'imgtag']
     start_option_args = ['image', 'imgtag', 'count']
     # gluster_optins_args = ['gluvolume', 'gluinst']
@@ -770,6 +767,9 @@ def main(dryr=0, dockit_log=dockit_log_file):
             logger.error("\n \t Unfortunately  You Missed:%s", good)
             parser.print_help()
             sys.exit(1)
+
+    logger.info(
+	"Dockit starting.. Process logs are available at:%s", dockit_log_file)
 
     if options.count:
         options.count = int(options.count)
