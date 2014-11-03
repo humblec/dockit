@@ -253,7 +253,7 @@ class Packageinst:
             sys.exit(1)
         else:
             sysdict['dist'] = dist
-            sysdict['ver'] = int(ver)
+            sysdict['ver'] = ver
             sysdict['name'] = name
             logger.info("Distribution:%s", sysdict['dist'])
             return True
@@ -270,13 +270,13 @@ class Packageinst:
             req_pcks = fedora_req_pcks
             rhelflag = 1
         elif sysdict['dist'] == "redhat":
-            if sysdict['ver'] < 7:
+            if sysdict['ver'] < '7':
                 req_pcks = rhel_req_pcks
             else:
                 req_pcks = rhel7_req_pcks
             rhelflag = 1
         elif sysdict['dist'] == "centos":
-            if sysdict['ver'] < 7:
+            if sysdict['ver'] < '7':
                 req_pcks = centos_req_pcks
             else:
                 req_pcks = centos7_req_pcks
