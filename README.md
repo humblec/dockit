@@ -17,6 +17,13 @@ You can use this (dockit)executable for:
 * This binary can be used to install any number of containers running with specified version of glusterfs binary
   and also to deploy gluster trusted pool on containers.
 
+
+Demo Video:
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=s7OCkyPuaVs
+" target="_blank"><img src="http://img.youtube.com/vi/s7OCkyPuaVs/0.jpg" 
+alt="Dockit Demo Video" width="240" height="180" border="10" /></a>
+
+
 #### PREPARE YOUR SETUP:
 
 * Install python-setuptools package or make sure you have 'setuptools' module available in your python path.
