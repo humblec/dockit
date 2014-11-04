@@ -19,9 +19,12 @@ You can use this (dockit)executable for:
 
 
 Demo Video:
+
+
+
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=s7OCkyPuaVs
 " target="_blank"><img src="http://img.youtube.com/vi/s7OCkyPuaVs/0.jpg" 
-alt="Dockit Demo Video" width="240" height="180" border="10" /></a>
+alt="Dockit Demo Video" width="440" height="280" border="10" /></a>
 
 
 #### PREPARE YOUR SETUP:
